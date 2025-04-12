@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { checkWord } from '@/entities/word';
-import type { GuessResult } from '@/entities/word';
+import { useState } from "react";
+import { checkWord } from "@/entities/word";
+import type { GuessResult } from "@/entities/word";
 
 const WORD_LENGTH = 5;
 const MAX_TRIES = 6;
 
-const DEFAULT_TARGET = 'REACT';
+const DEFAULT_TARGET = "REACT";
 
 export default function useWordleGame(): UseWordleGame {
   const [targetWord, setTargetWord] = useState(DEFAULT_TARGET);
