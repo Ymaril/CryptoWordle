@@ -1,47 +1,43 @@
-import { useState } from "react";
-import ReactCodeInput from "react-code-input";
+import { useState } from 'react';
+import VerificationInput from 'react-verification-input';
+import styles from './GuessInputRow.module.css';
 
 interface GuessInputRowProps {
   length: number;
-  onSubmit: (guess: string) => void;
+  onSubmit: (word: string) => void;
   disabled?: boolean;
 }
 
-export default function GuessInputRow({
-  length,
-  onSubmit,
-  disabled,
-}: GuessInputRowProps) {
-  const [value, setValue] = useState("");
+export default function GuessInputRow({ length, onSubmit }: GuessInputRowProps) {
+  const [value, setValue] = useState('');
 
   const handleChange = (val: string) => {
-    const upper = val.toUpperCase();
+    const upper = val.toUpperCase().replace(/[^A-Z]/g, '').slice(0, length);
     setValue(upper);
-    if (upper.length === length) {
-      onSubmit(upper);
-    }
+  };
+
+  const handleComplete = (val: string) => {
+    const clean = val.toUpperCase().replace(/[^A-Z]/g, '');
+    onSubmit(clean);
+    setValue('');
   };
 
   return (
-    <ReactCodeInput
-      name="guess"
-      type="text"
-      inputMode="latin"
-      fields={length}
+    <VerificationInput
       value={value}
       onChange={handleChange}
-      disabled={disabled}
-      inputStyle={{
-        width: "48px",
-        height: "48px",
-        margin: "4px",
-        fontSize: "24px",
-        textAlign: "center",
-        textTransform: "uppercase",
-        fontWeight: "bold",
-        border: "1px solid #999",
-        borderRadius: "4px",
+      onComplete={handleComplete}
+      length={length}
+      validChars="A-Za-z"
+      placeholder=""
+      autoFocus
+      classNames={{
+        container: styles.container,
+        character: styles.character,
+        characterInactive: styles.inactive,
       }}
     />
   );
 }
+
+export type { GuessInputRowProps };

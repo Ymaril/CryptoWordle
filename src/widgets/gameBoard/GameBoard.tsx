@@ -6,7 +6,7 @@ export default function GameBoard() {
   const { guesses, isGameOver, isWin, submitGuess, restart } = useWordleGame();
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center" }}>
       {guesses.map((guess, i) => (
         <GuessResultRow key={i} word={guess.word} statuses={guess.statuses} />
       ))}

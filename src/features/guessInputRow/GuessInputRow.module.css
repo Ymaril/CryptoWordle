@@ -1,0 +1,24 @@
+.container {
+  display: flex;
+  justify-content: center;
+}
+
+.character {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  text-transform: uppercase;
+  border: 1px solid #999;
+  color: black;
+  background-color: white;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.character:focus {
+  border-color: #646cff;
+}
+
+.inactive {
+  opacity: 0.4;
+}
