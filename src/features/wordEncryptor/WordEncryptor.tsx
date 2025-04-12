@@ -57,7 +57,7 @@ export default function WordEncryptor() {
           {encoded && (
             <div className={styles.linkWrapper}>
               <label htmlFor="link" className={styles.linkLabel}>
-                Ссылка:
+                The url:
               </label>
               <div className={styles.linkRow}>
                 <input
@@ -69,7 +69,7 @@ export default function WordEncryptor() {
                   onFocus={(e) => e.target.select()}
                 />
                 <button onClick={handleCopy} className={styles.copyButton}>
-                  {copied ? "Скопировано!" : "Копировать"}
+                  {copied ? "Copied!" : "Copy"}
                 </button>
               </div>
             </div>
@@ -77,7 +77,7 @@ export default function WordEncryptor() {
 
           {letterProgresses.length > 0 && (
             <div className={styles.letterProgress}>
-              <div>Прогресс по буквам:</div>
+              <div>Progress per letter:</div>
               <div className={styles.letterList}>
                 {letterProgresses.map((p, i) => (
                   <div key={i} className={styles.letterBox}>
@@ -89,7 +89,7 @@ export default function WordEncryptor() {
           )}
           
           <div>
-            Прогресс шифрования:{" "}
+            Encrypting progress:{" "}
             <span className={styles.progressValue}>
               {Math.round(progress * 100)}%
             </span>

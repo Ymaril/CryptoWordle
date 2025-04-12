@@ -21,7 +21,7 @@ export default function useWordleGame(): UseWordleGame {
       const encrypted = EncryptedWord.fromBase64Url(hash);
       setTargetEncrypted(encrypted);
     } catch (e) {
-      console.error("Невозможно прочитать зашифрованное слово из URL", e);
+      console.error("Unable to read encrypted word from URL", e);
     }
   }, []);
 
@@ -51,7 +51,7 @@ export default function useWordleGame(): UseWordleGame {
           });
 
           setCheckProgress(null);
-          sub.unsubscribe(); // поток больше не нужен
+          sub.unsubscribe();
         }
       });
   };

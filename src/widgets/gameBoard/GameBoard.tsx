@@ -25,7 +25,7 @@ export default function GameBoard() {
       ))}
       {checkProgress !== null && (
         <div style={{ marginTop: 12 }}>
-          Проверка: {Math.round(checkProgress * 100)}%
+          Checking: {Math.round(checkProgress * 100)}%
         </div>
       )}
 
@@ -35,9 +35,9 @@ export default function GameBoard() {
 
       {isGameOver && (
         <div style={{ marginTop: 20 }}>
-          <h2>{isWin ? "🎉 Победа!" : "💀 Проигрыш"}</h2>
+          <h2>{isWin ? "🎉 Win!" : "💀 Lose"}</h2>
           <button onClick={restart} style={{ marginTop: 12 }}>
-            Попробовать снова
+            Try again
           </button>
         </div>
       )}
