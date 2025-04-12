@@ -24,7 +24,7 @@ export default class Word {
       const char = this.plainWord[i] as UppercaseLetter;
       this.letters.push(new Letter(char, i));
 
-      if (!this.alphabet.some(c => c.char === char)) {
+      if (!this.alphabet.some((c) => c.char === char)) {
         this.alphabet.push(new Char(char));
       }
 
@@ -36,8 +36,8 @@ export default class Word {
     if (this.started) return;
     this.started = true;
 
-    this.letters.forEach(letter => letter.encrypt());
-    this.alphabet.forEach(char => char.encrypt());
+    this.letters.forEach((letter) => letter.encrypt());
+    this.alphabet.forEach((char) => char.encrypt());
 
     this.trackProgress();
   }
@@ -46,24 +46,30 @@ export default class Word {
     const letterStreams = this.getLetterProgressStreams();
     const alphabetStreams = this.getAlphabetProgressStreams();
 
-    combineLatest([combineLatest(letterStreams), combineLatest(alphabetStreams)]).pipe(
-      map(([letterProgresses, alphabetProgresses]) => {
-        const all = [...letterProgresses, ...alphabetProgresses];
-        const totalProgress = all.reduce((sum, p) => sum + p.progress, 0) / all.length;
+    combineLatest([
+      combineLatest(letterStreams),
+      combineLatest(alphabetStreams),
+    ])
+      .pipe(
+        map(([letterProgresses, alphabetProgresses]) => {
+          const all = [...letterProgresses, ...alphabetProgresses];
+          const totalProgress =
+            all.reduce((sum, p) => sum + p.progress, 0) / all.length;
 
-        const allDone = all.every(p => p.progress === 1);
+          const allDone = all.every((p) => p.progress === 1);
 
-        return {
-          progress: totalProgress,
-          result: allDone
-            ? new EncryptedWord(
-                letterProgresses.map(p => p.result!),
-                alphabetProgresses.map(p => p.result!)
-              )
-            : undefined
-        };
-      })
-    ).subscribe(this.progress$);
+          return {
+            progress: totalProgress,
+            result: allDone
+              ? new EncryptedWord(
+                  letterProgresses.map((p) => p.result!),
+                  alphabetProgresses.map((p) => p.result!),
+                )
+              : undefined,
+          };
+        }),
+      )
+      .subscribe(this.progress$);
   }
 
   getProgress$(): Observable<WordEncryptProgress> {
@@ -75,10 +81,10 @@ export default class Word {
   }
 
   getLetterProgressStreams(): Observable<EncryptProgress>[] {
-    return this.letters.map(letter => letter.getEncrypted$());
+    return this.letters.map((letter) => letter.getEncrypted$());
   }
 
   getAlphabetProgressStreams(): Observable<EncryptProgress>[] {
-    return this.alphabet.map(char => char.getEncrypted$());
+    return this.alphabet.map((char) => char.getEncrypted$());
   }
 }

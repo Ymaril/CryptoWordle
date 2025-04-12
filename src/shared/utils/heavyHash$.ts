@@ -8,7 +8,7 @@ interface HeavyHashProgress {
 
 export default function heavyHash$(
   data: string,
-  iterations: number
+  iterations: number,
 ): Observable<HeavyHashProgress> {
   return new Observable<HeavyHashProgress>((subscriber) => {
     const encoder = new TextEncoder();
@@ -39,7 +39,10 @@ export default function heavyHash$(
         subscriber.complete();
         return;
       }
-      const chunkIterations = Math.min(chunkSize, iterations - currentIteration);
+      const chunkIterations = Math.min(
+        chunkSize,
+        iterations - currentIteration,
+      );
 
       (async () => {
         for (let i = 0; i < chunkIterations; i++) {

@@ -16,7 +16,6 @@ export default function WordEncryptor() {
     newWord.encrypt();
   };
 
-  // Общий прогресс + результат
   useEffect(() => {
     if (!word) return;
 
@@ -37,15 +36,15 @@ export default function WordEncryptor() {
     const letterStreams = word.getLetterProgressStreams();
     const subs = letterStreams.map((stream$, index) =>
       stream$.subscribe(({ progress }) => {
-        setLetterProgresses(prev => {
+        setLetterProgresses((prev) => {
           const next = [...prev];
           next[index] = progress;
           return next;
         });
-      })
+      }),
     );
 
-    return () => subs.forEach(sub => sub.unsubscribe());
+    return () => subs.forEach((sub) => sub.unsubscribe());
   }, [word]);
 
   return (

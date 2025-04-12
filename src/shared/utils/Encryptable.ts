@@ -20,7 +20,7 @@ export default abstract class Encryptable {
     if (this.started || this.progress$.getValue().progress === 1) return;
     this.started = true;
 
-    heavyHash$(this.getHashInput(), Math.random() * 10000).subscribe(data => {
+    heavyHash$(this.getHashInput(), Math.random() * 10000).subscribe((data) => {
       this.progress$.next(data);
     });
   }

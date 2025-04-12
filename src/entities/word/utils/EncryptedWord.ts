@@ -18,12 +18,14 @@ export class EncryptedWord {
   }
 
   toBase64Url(): string {
-    return encodeBase64Url(JSON.stringify({ 
-      letters: this.encryptedLetters,
-      alphabet: this.encryptedAlphabet
-    }));
+    return encodeBase64Url(
+      JSON.stringify({
+        letters: this.encryptedLetters,
+        alphabet: this.encryptedAlphabet,
+      }),
+    );
   }
-  
+
   static fromBase64Url(encoded: string): EncryptedWord {
     const obj = JSON.parse(decodeBase64Url(encoded));
     return new EncryptedWord(obj.letters, obj.alphabet);
