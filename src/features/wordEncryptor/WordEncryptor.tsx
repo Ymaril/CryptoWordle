@@ -52,30 +52,8 @@ export default function WordEncryptor() {
 
   return (
     <div className={styles.container}>
-      <WordInput onSubmit={handleSubmit} clearOnSubmit={false} />
-
       {word && (
         <div className={styles.progressRow}>
-          <div>
-            Прогресс шифрования:{" "}
-            <span className={styles.progressValue}>
-              {Math.round(progress * 100)}%
-            </span>
-          </div>
-
-          {letterProgresses.length > 0 && (
-            <div className={styles.letterProgress}>
-              <div>Прогресс по буквам:</div>
-              <div className={styles.letterList}>
-                {letterProgresses.map((p, i) => (
-                  <div key={i} className={styles.letterBox}>
-                    {Math.round(p * 100)}%
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {encoded && (
             <div className={styles.linkWrapper}>
               <label htmlFor="link" className={styles.linkLabel}>
@@ -96,8 +74,29 @@ export default function WordEncryptor() {
               </div>
             </div>
           )}
+
+          {letterProgresses.length > 0 && (
+            <div className={styles.letterProgress}>
+              <div>Прогресс по буквам:</div>
+              <div className={styles.letterList}>
+                {letterProgresses.map((p, i) => (
+                  <div key={i} className={styles.letterBox}>
+                    {Math.round(p * 100)}%
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          <div>
+            Прогресс шифрования:{" "}
+            <span className={styles.progressValue}>
+              {Math.round(progress * 100)}%
+            </span>
+          </div>
         </div>
       )}
+      <WordInput onSubmit={handleSubmit} clearOnSubmit={false} />
     </div>
   );
 }
