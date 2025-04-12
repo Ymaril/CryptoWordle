@@ -1,54 +1,51 @@
-# React + TypeScript + Vite
+# 🔐 CryptoWordle
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A **cryptographically secure Wordle-style puzzle** — built for curiosity, challenge, and fun.
 
-Currently, two official plugins are available:
+The encrypted word cannot be reversed or revealed by reading the code or URL.  
+Brute-forcing is the only way to find it — and **guessing is brute-forcing**.  
+That's the entire game: each attempt is a costly cryptographic guess.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This game enforces that principle with **heavy hashing** and **stream-based validation**.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### ✨ What makes it unique?
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
+- Each letter is hashed using a salted, position-based strategy  
+- The hashing algorithm is intentionally expensive — to make guessing costly  
+- The encrypted word is encoded as a compact `base64url` string  
+- There is **no way to decrypt the original word**  
+- Guesses are validated **without revealing any internal state**  
+- **Reactive streams (RxJS)** power everything: encryption, progress, comparison  
+
+---
+
+### 🚀 Getting Started
+
+#### 1. Install dependencies
+
+```bash
+yarn
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+#### 2. Start the dev server
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    "react-x": reactX,
-    "react-dom": reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs["recommended-typescript"].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-});
+```bash
+yarn dev
 ```
+
+#### 3. Open in your browser
+
+```
+http://localhost:3000
+```
+
+---
+
+### 🛠️ Built With
+
+- ⚡️ **Vite** – modern build tool  
+- ⚛️ **React** + **TypeScript**  
+- 🔄 **RxJS** – fully reactive encryption and validation  
+- 🧮 **base64url** – safe and shareable encoded words  
