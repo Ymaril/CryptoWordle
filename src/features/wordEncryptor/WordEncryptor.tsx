@@ -45,7 +45,7 @@ export default function WordEncryptor() {
           next[index] = progress;
           return next;
         });
-      })
+      }),
     );
 
     return () => subs.forEach((sub) => sub.unsubscribe());
@@ -67,7 +67,10 @@ export default function WordEncryptor() {
       {word && (
         <div className={styles.progressRow}>
           <div>
-            Прогресс шифрования: <span className={styles.progressValue}>{Math.round(progress * 100)}%</span>
+            Прогресс шифрования:{" "}
+            <span className={styles.progressValue}>
+              {Math.round(progress * 100)}%
+            </span>
           </div>
 
           {letterProgresses.length > 0 && (
