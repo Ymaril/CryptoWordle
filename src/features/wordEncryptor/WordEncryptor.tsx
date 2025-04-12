@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { WordInput, Word } from "@/entities/word";
+import styles from "./WordEncryptor.module.css";
 
 export default function WordEncryptor() {
   const [word, setWord] = useState<Word | null>(null);
   const [progress, setProgress] = useState(0);
   const [encoded, setEncoded] = useState<string | null>(null);
   const [letterProgresses, setLetterProgresses] = useState<number[]>([]);
+  const [copied, setCopied] = useState(false);
 
   const handleSubmit = (text: string) => {
     const newWord = new Word(text);
@@ -13,6 +15,7 @@ export default function WordEncryptor() {
     setProgress(0);
     setEncoded(null);
     setLetterProgresses(Array(text.length).fill(0));
+    setCopied(false);
     newWord.encrypt();
   };
 
@@ -22,14 +25,15 @@ export default function WordEncryptor() {
     const sub = word.getProgress$().subscribe(({ progress, result }) => {
       setProgress(progress);
       if (result) {
-        setEncoded(result.toBase64Url());
+        const hash = result.toBase64Url();
+        setEncoded(hash);
+        window.location.hash = hash;
       }
     });
 
     return () => sub.unsubscribe();
   }, [word]);
 
-  // Прогресс по каждой букве
   useEffect(() => {
     if (!word) return;
 
@@ -41,37 +45,37 @@ export default function WordEncryptor() {
           next[index] = progress;
           return next;
         });
-      }),
+      })
     );
 
     return () => subs.forEach((sub) => sub.unsubscribe());
   }, [word]);
 
+  const link = encoded ? `${window.location.origin}/#${encoded}` : "";
+
+  const handleCopy = async () => {
+    if (!link) return;
+    await navigator.clipboard.writeText(link);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <div>
+    <div className={styles.container}>
       <WordInput onSubmit={handleSubmit} clearOnSubmit={false} />
 
       {word && (
-        <div style={{ marginTop: 16 }}>
+        <div className={styles.progressRow}>
           <div>
-            Прогресс шифрования: <strong>{Math.round(progress * 100)}%</strong>
+            Прогресс шифрования: <span className={styles.progressValue}>{Math.round(progress * 100)}%</span>
           </div>
 
           {letterProgresses.length > 0 && (
-            <div style={{ marginTop: 12 }}>
+            <div className={styles.letterProgress}>
               <div>Прогресс по буквам:</div>
-              <div style={{ display: "flex", gap: 8 }}>
+              <div className={styles.letterList}>
                 {letterProgresses.map((p, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      padding: "4px 8px",
-                      border: "1px solid #ccc",
-                      borderRadius: 4,
-                      minWidth: 32,
-                      textAlign: "center",
-                    }}
-                  >
+                  <div key={i} className={styles.letterBox}>
                     {Math.round(p * 100)}%
                   </div>
                 ))}
@@ -80,9 +84,23 @@ export default function WordEncryptor() {
           )}
 
           {encoded && (
-            <div style={{ marginTop: 12 }}>
-              <div>Итог (base64url):</div>
-              <code style={{ wordBreak: "break-all" }}>{encoded}</code>
+            <div className={styles.linkWrapper}>
+              <label htmlFor="link" className={styles.linkLabel}>
+                Ссылка:
+              </label>
+              <div className={styles.linkRow}>
+                <input
+                  id="link"
+                  type="text"
+                  readOnly
+                  value={link}
+                  className={styles.linkInput}
+                  onFocus={(e) => e.target.select()}
+                />
+                <button onClick={handleCopy} className={styles.copyButton}>
+                  {copied ? "Скопировано!" : "Копировать"}
+                </button>
+              </div>
             </div>
           )}
         </div>

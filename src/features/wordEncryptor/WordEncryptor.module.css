@@ -1,0 +1,74 @@
+.container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.progressRow {
+  margin-top: 24px;
+}
+
+.progressValue {
+  font-weight: bold;
+}
+
+.letterProgress {
+  margin-top: 12px;
+}
+
+.letterList {
+  display: flex;
+  gap: 8px;
+}
+
+.letterBox {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 48px;
+  text-align: center;
+  background: #f5f5f5;
+  font-variant-numeric: tabular-nums;
+}
+
+.linkWrapper {
+  margin-top: 20px;
+}
+
+.linkLabel {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.linkRow {
+  display: flex;
+  gap: 8px;
+}
+
+.linkInput {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 14px;
+  background-color: #f9f9f9;
+}
+
+.copyButton {
+  padding: 8px 12px;
+  font-size: 14px;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.copyButton:hover {
+  background-color: #ddd;
+}
