@@ -1,87 +1,88 @@
-import { Encrypted, decodeBase64Url, encodeBase64Url } from "@/shared/utils";
-import GuessedWord from "./GuessedWord";
-import { GuessedLetter, GuessedLetterStatus } from "@/entities/letter";
+import { Observable, combineLatest, map } from "rxjs";
+import { decodeBase64Url, encodeBase64Url } from "@/shared/utils";
+import type { Hash } from "@/shared/types";
 import Word from "./Word";
-import { Observable, filter, map, take } from "rxjs";
+import { GuessedLetterStatus, Letter } from "@/entities/letter";
+import GuessedWord from "./GuessedWord";
+
+export interface CompareProgress {
+  progress: number;
+  result?: GuessedWord;
+}
 
 export default class EncryptedWord {
-  private encryptedLetters: Encrypted[];
-  private encryptedAlphabet: Encrypted[];
+  readonly greenHashes: Hash[];
+  readonly yellowHashes: Hash[];
 
-  constructor(encryptedLetters: Encrypted[], encryptedAlphabet: Encrypted[]) {
-    this.encryptedLetters = encryptedLetters;
-    this.encryptedAlphabet = encryptedAlphabet;
-  }
-
-  get length(): number {
-    return this.encryptedLetters.length;
-  }
-
-  get letters(): Encrypted[] {
-    return this.encryptedAlphabet;
+  constructor(greenHashes: Hash[], yellowHashes: Hash[]) {
+    this.greenHashes = greenHashes;
+    this.yellowHashes = yellowHashes;
   }
 
   toBase64Url(): string {
     return encodeBase64Url(
       JSON.stringify({
-        letters: this.encryptedLetters,
-        alphabet: this.encryptedAlphabet,
+        green: this.greenHashes,
+        yellow: this.yellowHashes,
       }),
     );
   }
 
   static fromBase64Url(encoded: string): EncryptedWord {
-    const obj = JSON.parse(decodeBase64Url(encoded));
-    return new EncryptedWord(obj.letters, obj.alphabet);
+    const { green, yellow } = JSON.parse(decodeBase64Url(encoded));
+    return new EncryptedWord(green, yellow);
   }
 
-  compareWith$(word: Word): Observable<GuessedWord> {
-    word.encrypt();
+  checkWord$(word: Word): Observable<{
+    progress: number;
+    result?: GuessedWord;
+  }> {
+    const letterStreams = word.letters.map((letter) =>
+      this.checkLetter$(letter).pipe(
+        map(({ progress, status }) => ({
+          char: letter.char,
+          progress,
+          status,
+        })),
+      ),
+    );
 
-    return word.getProgress$().pipe(
-      filter((p) => !!p.result),
-      take(1),
-      map(() => {
-        const result: GuessedLetter[] = [];
+    return combineLatest(letterStreams).pipe(
+      map((letters) => {
+        const progress =
+          letters.reduce((sum, l) => sum + l.progress, 0) / letters.length;
+        if (progress !== 1) return { progress };
 
-        const attemptLetters = word.letters;
-        const attemptEncrypted = attemptLetters.map(
-          (l) => l.getEncryptedValue()!,
-        );
+        const guessedLetters = letters.map(({ char, status }) => ({
+          char,
+          status: status!,
+        }));
 
-        const used = Array(this.encryptedLetters.length).fill(false);
+        return {
+          progress: 1,
+          result: new GuessedWord(guessedLetters),
+        };
+      }),
+    );
+  }
 
-        // 1. Correct
-        for (let i = 0; i < attemptLetters.length; i++) {
-          const encrypted = attemptEncrypted[i];
-          const isCorrect = encrypted === this.encryptedLetters[i];
+  checkLetter$(letter: Letter): Observable<{
+    progress: number;
+    status: GuessedLetterStatus | null;
+  }> {
+    return letter.encrypt$().pipe(
+      map(({ progress, greenHash, yellowHash }) => {
+        if (!greenHash && !yellowHash) return { progress, status: null };
 
-          result.push({
-            char: attemptLetters[i].char,
-            status: isCorrect
-              ? GuessedLetterStatus.Correct
-              : GuessedLetterStatus.Wrong,
-          });
-
-          if (isCorrect) {
-            used[i] = true;
-          }
+        if (greenHash && greenHash === this.greenHashes[letter.position]) {
+          return { progress, status: GuessedLetterStatus.Correct };
         }
 
-        // 2. Misplaced
-        for (let i = 0; i < attemptLetters.length; i++) {
-          if (result[i].status === GuessedLetterStatus.Correct) continue;
-
-          for (let j = 0; j < this.encryptedLetters.length; j++) {
-            if (!used[j] && attemptEncrypted[i] === this.encryptedLetters[j]) {
-              result[i].status = GuessedLetterStatus.Misplaced;
-              used[j] = true;
-              break;
-            }
-          }
+        if (yellowHash && this.yellowHashes.includes(yellowHash)) {
+          return { progress, status: GuessedLetterStatus.Misplaced };
         }
 
-        return new GuessedWord(result);
+        return { progress, status: GuessedLetterStatus.Wrong };
       }),
     );
   }

@@ -1,54 +1,44 @@
 import { useEffect, useState } from "react";
 import { WordInput, Word } from "@/entities/word";
+import { EncryptedWord } from "@/entities/word";
 import styles from "./WordEncryptor.module.css";
 
 export default function WordEncryptor() {
   const [word, setWord] = useState<Word | null>(null);
   const [progress, setProgress] = useState(0);
-  const [encoded, setEncoded] = useState<string | null>(null);
   const [letterProgresses, setLetterProgresses] = useState<number[]>([]);
+  const [encoded, setEncoded] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   const handleSubmit = (text: string) => {
     const newWord = new Word(text);
     setWord(newWord);
     setProgress(0);
-    setEncoded(null);
     setLetterProgresses(Array(text.length).fill(0));
+    setEncoded(null);
     setCopied(false);
-    newWord.encrypt();
   };
 
   useEffect(() => {
     if (!word) return;
 
-    const sub = word.getProgress$().subscribe(({ progress, result }) => {
+    const progressSub = word.encrypt$().subscribe(({ progress, letters }) => {
       setProgress(progress);
-      if (result) {
-        const hash = result.toBase64Url();
-        setEncoded(hash);
-        window.location.hash = hash;
-      }
+      setLetterProgresses(letters.map((l) => l.progress));
     });
 
-    return () => sub.unsubscribe();
-  }, [word]);
+    const resultSub = word
+      .toEncryptedWord$()
+      .subscribe((encrypted: EncryptedWord) => {
+        const hash = encrypted.toBase64Url();
+        setEncoded(hash);
+        window.location.hash = hash;
+      });
 
-  useEffect(() => {
-    if (!word) return;
-
-    const letterStreams = word.getLetterProgressStreams();
-    const subs = letterStreams.map((stream$, index) =>
-      stream$.subscribe(({ progress }) => {
-        setLetterProgresses((prev) => {
-          const next = [...prev];
-          next[index] = progress;
-          return next;
-        });
-      }),
-    );
-
-    return () => subs.forEach((sub) => sub.unsubscribe());
+    return () => {
+      progressSub.unsubscribe();
+      resultSub.unsubscribe();
+    };
   }, [word]);
 
   const link = encoded ? `${window.location.origin}/#${encoded}` : "";

@@ -5,7 +5,9 @@ const WORD_LENGTH = 5;
 const MAX_TRIES = 6;
 
 export default function useWordleGame(): UseWordleGame {
-  const [targetEncrypted, setTargetEncrypted] = useState<EncryptedWord | null>(null);
+  const [targetEncrypted, setTargetEncrypted] = useState<EncryptedWord | null>(
+    null,
+  );
   const [guessedWords, setGuessedWords] = useState<GuessedWord[]>([]);
   const [isWin, setIsWin] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
@@ -24,21 +26,21 @@ export default function useWordleGame(): UseWordleGame {
   }, []);
 
   const submitGuess = (guessText: string) => {
-    if (!targetEncrypted || isGameOver || guessText.length !== WORD_LENGTH) return;
+    if (!targetEncrypted || isGameOver || guessText.length !== WORD_LENGTH)
+      return;
 
     const guessWord = new Word(guessText);
-    guessWord.encrypt(); // явно запустить шифрование
 
-    const progressSub = guessWord.getProgress$().subscribe(({ progress, result }) => {
-      setCheckProgress(progress);
+    const sub = targetEncrypted
+      .checkWord$(guessWord)
+      .subscribe(({ progress, result }) => {
+        setCheckProgress(progress);
 
-      if (result) {
-        // когда всё готово — сравниваем
-        targetEncrypted.compareWith$(guessWord).subscribe((guessedWord) => {
+        if (result) {
           setGuessedWords((prev) => {
-            const next = [...prev, guessedWord];
+            const next = [...prev, result];
 
-            if (guessedWord.isCorrect()) {
+            if (result.isCorrect()) {
               setIsWin(true);
               setIsGameOver(true);
             } else if (next.length >= MAX_TRIES) {
@@ -49,10 +51,9 @@ export default function useWordleGame(): UseWordleGame {
           });
 
           setCheckProgress(null);
-          progressSub.unsubscribe();
-        });
-      }
-    });
+          sub.unsubscribe(); // поток больше не нужен
+        }
+      });
   };
 
   const restart = () => {

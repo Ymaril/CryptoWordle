@@ -1,90 +1,56 @@
-import { BehaviorSubject, Observable, combineLatest, map } from "rxjs";
+import {
+  combineLatest,
+  filter,
+  map,
+  Observable,
+  shareReplay,
+  take,
+} from "rxjs";
+import { Letter, LetterEncryptProgress } from "@/entities/letter";
 import EncryptedWord from "./EncryptedWord";
-import { Char, Letter } from "@/entities/letter";
-import { UppercaseLetter } from "@/shared/types";
-import { EncryptProgress, shuffleArray } from "@/shared/utils";
-
-interface WordEncryptProgress {
-  progress: number;
-  result?: EncryptedWord;
-}
+import type { UppercaseLetter } from "@/shared/types";
 
 export default class Word {
-  plainWord: string;
-  letters: Letter[] = [];
-  alphabet: Char[] = [];
-  private progress$ = new BehaviorSubject<WordEncryptProgress>({ progress: 0 });
+  readonly letters: Letter[];
 
-  private started = false;
-
-  constructor(plainWord: string) {
-    this.plainWord = plainWord.toUpperCase();
-
-    for (let i = 0; i < this.plainWord.length; i++) {
-      const char = this.plainWord[i] as UppercaseLetter;
-      this.letters.push(new Letter(char, i));
-
-      if (!this.alphabet.some((c) => c.char === char)) {
-        this.alphabet.push(new Char(char));
-      }
-
-      this.alphabet = shuffleArray(this.alphabet);
-    }
+  constructor(word: string) {
+    this.letters = word
+      .toUpperCase()
+      .split("")
+      .map((char, i) => new Letter(char as UppercaseLetter, i));
   }
 
-  encrypt(): void {
-    if (this.started) return;
-    this.started = true;
-
-    this.letters.forEach((letter) => letter.encrypt());
-    this.alphabet.forEach((char) => char.encrypt());
-
-    this.trackProgress();
+  lettersEncrypt$(): Observable<LetterEncryptProgress[]> {
+    return combineLatest(this.letters.map((l) => l.encrypt$())).pipe(
+      shareReplay(1),
+    );
   }
 
-  private trackProgress() {
-    const letterStreams = this.getLetterProgressStreams();
-    const alphabetStreams = this.getAlphabetProgressStreams();
-
-    combineLatest([
-      combineLatest(letterStreams),
-      combineLatest(alphabetStreams),
-    ])
-      .pipe(
-        map(([letterProgresses, alphabetProgresses]) => {
-          const all = [...letterProgresses, ...alphabetProgresses];
-          const totalProgress =
-            all.reduce((sum, p) => sum + p.progress, 0) / all.length;
-
-          const allDone = all.every((p) => p.progress === 1);
-
-          return {
-            progress: totalProgress,
-            result: allDone
-              ? new EncryptedWord(
-                  letterProgresses.map((p) => p.result!),
-                  alphabetProgresses.map((p) => p.result!),
-                )
-              : undefined,
-          };
-        }),
-      )
-      .subscribe(this.progress$);
+  encrypt$(): Observable<{
+    progress: number;
+    letters: LetterEncryptProgress[];
+  }> {
+    return this.lettersEncrypt$().pipe(
+      map((letters) => ({
+        letters,
+        progress:
+          letters.reduce((sum, l) => sum + l.progress, 0) / letters.length,
+      })),
+      shareReplay(1),
+    );
   }
 
-  getProgress$(): Observable<WordEncryptProgress> {
-    return this.progress$.asObservable();
-  }
-
-  getCurrentProgress(): WordEncryptProgress {
-    return this.progress$.getValue();
-  }
-
-  getLetterProgressStreams(): Observable<EncryptProgress>[] {
-    return this.letters.map((letter) => letter.getEncrypted$());
-  }
-
-  getAlphabetProgressStreams(): Observable<EncryptProgress>[] {
-    return this.alphabet.map((char) => char.getEncrypted$());
+  toEncryptedWord$(): Observable<EncryptedWord> {
+    return this.lettersEncrypt$().pipe(
+      filter((letters) => letters.every((p) => p.progress === 1)),
+      take(1),
+      map(
+        (letters) =>
+          new EncryptedWord(
+            letters.map((p) => p.greenHash!),
+            letters.map((p) => p.yellowHash!),
+          ),
+      ),
+    );
   }
 }

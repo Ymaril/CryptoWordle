@@ -1,6 +1,6 @@
 import { Observable } from "rxjs";
 
-interface HeavyHashProgress {
+export interface HeavyHashProgress {
   progress: number;
   iteration: number;
   result: string;

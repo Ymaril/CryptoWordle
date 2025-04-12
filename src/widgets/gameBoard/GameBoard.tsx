@@ -2,8 +2,14 @@ import { useWordleGame } from "@/features/game";
 import { WordInput, WordRow } from "@/entities/word";
 
 export default function GameBoard() {
-  const { guessedWords, isGameOver, isWin, submitGuess, restart, checkProgress } =
-    useWordleGame();
+  const {
+    guessedWords,
+    isGameOver,
+    isWin,
+    submitGuess,
+    restart,
+    checkProgress,
+  } = useWordleGame();
 
   return (
     <div
@@ -23,7 +29,9 @@ export default function GameBoard() {
         </div>
       )}
 
-      {!isGameOver && <WordInput onSubmit={submitGuess} disabled={checkProgress !== null} />}
+      {!isGameOver && (
+        <WordInput onSubmit={submitGuess} disabled={checkProgress !== null} />
+      )}
 
       {isGameOver && (
         <div style={{ marginTop: 20 }}>
