@@ -1,13 +1,12 @@
 import "./App.css";
-import { LetterBox } from "@/shared/ui";
+import GuessRow from '@/features/guessRow';
 
-export function App() {
+export default function App() {
   return (
-    <div style={{ display: 'flex', gap: 5, padding: 20 }}>
-      <LetterBox letter="A" status="correct" />
-      <LetterBox letter="B" status="misplaced" />
-      <LetterBox letter="C" status="wrong" />
-      <LetterBox letter="D" />
+    <div style={{ padding: 20 }}>
+      <GuessRow word="REACT" statuses={['correct', 'wrong', 'misplaced', 'default', 'default']} />
+      <br />
+      <GuessRow word="NODE" />
     </div>
   );
 }

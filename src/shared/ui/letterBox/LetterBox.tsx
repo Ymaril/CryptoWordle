@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "./LetterBox.module.css";
 
 export type LetterStatus = "correct" | "misplaced" | "wrong" | "default";
@@ -8,9 +7,9 @@ interface LetterBoxProps {
   status?: LetterStatus;
 }
 
-export const LetterBox: React.FC<LetterBoxProps> = ({
+export default function LetterBox({
   letter = "",
   status = "default",
-}) => {
+}: LetterBoxProps) {
   return <div className={`${styles.box} ${styles[status]}`}>{letter}</div>;
-};
+}
