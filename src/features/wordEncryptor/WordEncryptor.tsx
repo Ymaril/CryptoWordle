@@ -41,7 +41,8 @@ export default function WordEncryptor() {
     };
   }, [word]);
 
-  const link = encoded ? `${window.location.origin}/#${encoded}` : "";
+  const baseUrl = `${window.location.origin}${window.location.pathname}`;
+  const link = encoded ? `${baseUrl}#${encoded}` : "";
 
   const handleCopy = async () => {
     if (!link) return;
