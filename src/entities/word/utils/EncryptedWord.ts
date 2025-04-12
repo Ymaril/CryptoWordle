@@ -4,7 +4,7 @@ import { GuessedLetter, GuessedLetterStatus } from "@/entities/letter";
 import Word from "./Word";
 import { Observable, filter, map, take } from "rxjs";
 
-export class EncryptedWord {
+export default class EncryptedWord {
   private encryptedLetters: Encrypted[];
   private encryptedAlphabet: Encrypted[];
 

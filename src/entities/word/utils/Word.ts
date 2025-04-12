@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, combineLatest, map } from "rxjs";
-import { EncryptedWord } from "./EncryptedWord";
+import EncryptedWord from "./EncryptedWord";
 import { Char, Letter } from "@/entities/letter";
 import { UppercaseLetter } from "@/shared/types";
 import { EncryptProgress, shuffleArray } from "@/shared/utils";
