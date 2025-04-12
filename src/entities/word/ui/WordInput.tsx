@@ -5,6 +5,7 @@ import styles from "./WordInput.module.css";
 interface WordInputProps {
   onSubmit: (word: string) => void;
   clearOnSubmit?: boolean;
+  disabled?: boolean;
 }
 
 const LENGTH = 5;
@@ -12,10 +13,13 @@ const LENGTH = 5;
 export default function WordInput({
   onSubmit,
   clearOnSubmit = true,
+  disabled = false,
 }: WordInputProps) {
   const [value, setValue] = useState("");
 
   const handleChange = (val: string) => {
+    if (disabled) return;
+
     const upper = val
       .toUpperCase()
       .replace(/[^A-Z]/g, "")

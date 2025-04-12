@@ -2,7 +2,7 @@ import { useWordleGame } from "@/features/game";
 import { WordInput, WordRow } from "@/entities/word";
 
 export default function GameBoard() {
-  const { guessedWords, isGameOver, isWin, submitGuess, restart } =
+  const { guessedWords, isGameOver, isWin, submitGuess, restart, checkProgress } =
     useWordleGame();
 
   return (
@@ -17,8 +17,13 @@ export default function GameBoard() {
       {guessedWords.map((guessedWord, i) => (
         <WordRow key={i} guessedWord={guessedWord} />
       ))}
+      {checkProgress !== null && (
+        <div style={{ marginTop: 12 }}>
+          Проверка: {Math.round(checkProgress * 100)}%
+        </div>
+      )}
 
-      {!isGameOver && <WordInput onSubmit={submitGuess} />}
+      {!isGameOver && <WordInput onSubmit={submitGuess} disabled={checkProgress !== null} />}
 
       {isGameOver && (
         <div style={{ marginTop: 20 }}>

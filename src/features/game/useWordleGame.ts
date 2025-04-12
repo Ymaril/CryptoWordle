@@ -9,10 +9,10 @@ export default function useWordleGame(): UseWordleGame {
   const [guessedWords, setGuessedWords] = useState<GuessedWord[]>([]);
   const [isWin, setIsWin] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [checkProgress, setCheckProgress] = useState<number | null>(null);
 
-  // 1. Извлекаем и парсим зашифрованную цель
   useEffect(() => {
-    const hash = window.location.hash.slice(1); // убираем #
+    const hash = window.location.hash.slice(1);
     if (!hash) return;
 
     try {
@@ -23,53 +23,62 @@ export default function useWordleGame(): UseWordleGame {
     }
   }, []);
 
-  // 2. Отправляем попытку
   const submitGuess = (guessText: string) => {
     if (!targetEncrypted || isGameOver || guessText.length !== WORD_LENGTH) return;
 
     const guessWord = new Word(guessText);
+    guessWord.encrypt(); // явно запустить шифрование
 
-    targetEncrypted.compareWith$(guessWord).subscribe((guessedWord) => {
-      setGuessedWords((prev) => {
-        const next = [...prev, guessedWord];
+    const progressSub = guessWord.getProgress$().subscribe(({ progress, result }) => {
+      setCheckProgress(progress);
 
-        // победа?
-        if (guessedWord.isCorrect()) {
-          setIsWin(true);
-          setIsGameOver(true);
-        } else if (next.length >= MAX_TRIES) {
-          setIsGameOver(true);
-        }
+      if (result) {
+        // когда всё готово — сравниваем
+        targetEncrypted.compareWith$(guessWord).subscribe((guessedWord) => {
+          setGuessedWords((prev) => {
+            const next = [...prev, guessedWord];
 
-        return next;
-      });
+            if (guessedWord.isCorrect()) {
+              setIsWin(true);
+              setIsGameOver(true);
+            } else if (next.length >= MAX_TRIES) {
+              setIsGameOver(true);
+            }
+
+            return next;
+          });
+
+          setCheckProgress(null);
+          progressSub.unsubscribe();
+        });
+      }
     });
   };
 
   const restart = () => {
-    // Можно перегенерировать хэш или оставить как есть
     setGuessedWords([]);
     setIsWin(false);
     setIsGameOver(false);
+    setCheckProgress(null);
   };
 
   return {
-    targetWord: targetEncrypted, // не строка, а EncryptedWord (или null)
+    targetWord: targetEncrypted,
     guessedWords,
     isWin,
     isGameOver,
+    checkProgress,
     submitGuess,
     restart,
   };
 }
 
-interface UseWordleGame {
+export interface UseWordleGame {
   targetWord: EncryptedWord | null;
   guessedWords: GuessedWord[];
   isWin: boolean;
   isGameOver: boolean;
+  checkProgress: number | null;
   submitGuess: (guess: string) => void;
   restart: () => void;
 }
-
-export type { UseWordleGame };
