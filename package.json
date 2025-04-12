@@ -12,6 +12,7 @@
   "dependencies": {
     "path": "^0.12.7",
     "react": "^19.0.0",
+    "react-code-input": "^3.10.1",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
