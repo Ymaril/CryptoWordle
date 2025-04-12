@@ -1,10 +1,10 @@
-import Letter, { LetterStatus } from "../types/Letter";
+import Letter, { GuessedLetterStatus } from "../types/GuessedLetter";
 import styles from "./LetterBox.module.css";
 
 const STATUS_STYLES = {
-  [LetterStatus.Correct]: styles.correct,
-  [LetterStatus.Misplaced]: styles.misplaced,
-  [LetterStatus.Wrong]: styles.wrong,
+  [GuessedLetterStatus.Correct]: styles.correct,
+  [GuessedLetterStatus.Misplaced]: styles.misplaced,
+  [GuessedLetterStatus.Wrong]: styles.wrong,
 };
 
 export default function LetterBox({ letter }: { letter: Letter }) {

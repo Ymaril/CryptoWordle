@@ -1,15 +1,15 @@
-import { Letter, LetterStatus } from "@/entities/letter";
+import { GuessedLetter, GuessedLetterStatus } from "@/entities/letter";
 
 export default class GuessedWord {
-  letters: Letter[];
+  letters: GuessedLetter[];
 
-  constructor(letters: Letter[]) {
+  constructor(letters: GuessedLetter[]) {
     this.letters = letters;
   }
 
   isCorrect() {
     return this.letters.every(
-      (letter) => letter.status === LetterStatus.Correct,
+      (letter) => letter.status === GuessedLetterStatus.Correct,
     );
   }
 }

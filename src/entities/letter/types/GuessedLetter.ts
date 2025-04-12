@@ -1,12 +1,12 @@
 import { UppercaseLetter } from "@/shared/types";
 
-export enum LetterStatus {
+export enum GuessedLetterStatus {
   Correct,
   Misplaced,
   Wrong,
 }
 
-export default interface Letter {
+export default interface GuessedLetter {
   char: UppercaseLetter;
-  status: LetterStatus;
+  status: GuessedLetterStatus;
 }
