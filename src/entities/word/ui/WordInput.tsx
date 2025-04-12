@@ -1,28 +1,26 @@
-import { useState } from "react";
-import VerificationInput from "react-verification-input";
-import styles from "./WordInput.module.css";
+import { useState } from 'react';
+import VerificationInput from 'react-verification-input';
+import styles from './WordInput.module.css';
 
 interface WordInputProps {
   onSubmit: (word: string) => void;
+  clearOnSubmit?: boolean;
 }
 
 const LENGTH = 5;
 
-export default function WordInput({ onSubmit }: WordInputProps) {
-  const [value, setValue] = useState("");
+export default function WordInput({ onSubmit, clearOnSubmit = true }: WordInputProps) {
+  const [value, setValue] = useState('');
 
   const handleChange = (val: string) => {
-    const upper = val
-      .toUpperCase()
-      .replace(/[^A-Z]/g, "")
-      .slice(0, LENGTH);
+    const upper = val.toUpperCase().replace(/[^A-Z]/g, '').slice(0, LENGTH);
     setValue(upper);
   };
 
   const handleComplete = (val: string) => {
-    const clean = val.toUpperCase().replace(/[^A-Z]/g, "");
+    const clean = val.toUpperCase().replace(/[^A-Z]/g, '');
     onSubmit(clean);
-    setValue("");
+    clearOnSubmit &&setValue('');
   };
 
   return (

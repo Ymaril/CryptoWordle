@@ -1,4 +1,4 @@
-import { Encrypted } from "@/shared/utils";
+import { Encrypted, decodeBase64Url, encodeBase64Url } from "@/shared/utils";
 
 export class EncryptedWord {
   private encryptedLetters: Encrypted[];
@@ -15,5 +15,17 @@ export class EncryptedWord {
 
   get letters(): Encrypted[] {
     return this.encryptedAlphabet;
+  }
+
+  toBase64Url(): string {
+    return encodeBase64Url(JSON.stringify({ 
+      letters: this.encryptedLetters,
+      alphabet: this.encryptedAlphabet
+    }));
+  }
+  
+  static fromBase64Url(encoded: string): EncryptedWord {
+    const obj = JSON.parse(decodeBase64Url(encoded));
+    return new EncryptedWord(obj.letters, obj.alphabet);
   }
 }
