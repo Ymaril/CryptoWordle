@@ -1,5 +1,6 @@
 import GuessInputRow from "@/features/guessInputRow";
 import "./App.css";
+import { GuessResultRow } from "@/entities/word";
 
 export default function App() {
   return (
@@ -10,6 +11,12 @@ export default function App() {
           console.log("Guess submitted:", word);
         }}
       />
+      <div style={{ padding: 20 }}>
+        <GuessResultRow
+          word="REACT"
+          statuses={['correct', 'wrong', 'misplaced', 'wrong', 'correct']}
+        />
+      </div>
     </div>
   );
 }
