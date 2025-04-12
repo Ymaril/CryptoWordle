@@ -1,6 +1,6 @@
 import styles from "./LetterBox.module.css";
 
-export type LetterStatus = "correct" | "misplaced" | "wrong" | "default";
+type LetterStatus = "correct" | "misplaced" | "wrong" | "default";
 
 interface LetterBoxProps {
   letter?: string;
@@ -11,5 +11,11 @@ export default function LetterBox({
   letter = "",
   status = "default",
 }: LetterBoxProps) {
-  return <div className={`${styles.box} ${styles[status]}`}>{letter}</div>;
+  return (
+    <div className={`${styles.box} ${styles[status]}`}>
+      {letter.toUpperCase()}
+    </div>
+  );
 }
+
+export type { LetterBoxProps, LetterStatus };

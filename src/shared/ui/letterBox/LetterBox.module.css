@@ -1,28 +1,32 @@
 .box {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border: 1px solid #999;
   display: flex;
   align-items: center;
   justify-content: center;
-  text-transform: uppercase;
   font-weight: bold;
-  font-size: 18px;
-  color: #fff;
+  font-size: 20px;
+  text-transform: uppercase;
+  user-select: none;
 }
 
 .correct {
   background-color: #6aaa64;
+  color: white;
 }
 
 .misplaced {
   background-color: #c9b458;
+  color: white;
 }
 
 .wrong {
   background-color: #787c7e;
+  color: white;
 }
 
 .default {
   background-color: #d3d6da;
+  color: black;
 }
