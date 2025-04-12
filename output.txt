@@ -1,0 +1,278 @@
+import styles from "./LetterBox.module.css";
+
+type LetterStatus = "correct" | "misplaced" | "wrong" | "default";
+
+interface LetterBoxProps {
+  letter?: string;
+  status?: LetterStatus;
+}
+
+export default function LetterBox({
+  letter = "",
+  status = "default",
+}: LetterBoxProps) {
+  return (
+    <div className={`${styles.box} ${styles[status]}`}>
+      {letter.toUpperCase()}
+    </div>
+  );
+}
+
+export type { LetterBoxProps, LetterStatus };
+.box {
+  width: 48px;
+  height: 48px;
+  border: 1px solid #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 20px;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.correct {
+  background-color: #6aaa64;
+  color: white;
+}
+
+.misplaced {
+  background-color: #c9b458;
+  color: white;
+}
+
+.wrong {
+  background-color: #787c7e;
+  color: white;
+}
+
+.default {
+  background-color: #d3d6da;
+  color: black;
+}
+import LetterBox from "./LetterBox";
+export default LetterBox;
+export type { LetterBoxProps, LetterStatus } from "./LetterBox";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import App from "./app";
+
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
+/// <reference types="vite/client" />
+import { useState } from "react";
+import ReactCodeInput from "react-code-input";
+
+interface GuessInputRowProps {
+  length: number;
+  onSubmit: (guess: string) => void;
+  disabled?: boolean;
+}
+
+export default function GuessInputRow({
+  length,
+  onSubmit,
+  disabled,
+}: GuessInputRowProps) {
+  const [value, setValue] = useState("");
+
+  const handleChange = (val: string) => {
+    const upper = val.toUpperCase();
+    setValue(upper);
+    if (upper.length === length) {
+      onSubmit(upper);
+    }
+  };
+
+  return (
+    <ReactCodeInput
+      name="guess"
+      type="text"
+      inputMode="latin"
+      fields={length}
+      value={value}
+      onChange={handleChange}
+      disabled={disabled}
+      inputStyle={{
+        width: "48px",
+        height: "48px",
+        margin: "4px",
+        fontSize: "24px",
+        textAlign: "center",
+        textTransform: "uppercase",
+        fontWeight: "bold",
+        border: "1px solid #999",
+        borderRadius: "4px",
+      }}
+    />
+  );
+}
+import GuessInputRow from "./GuessInputRow";
+
+export default GuessInputRow;
+import LetterBox, { LetterStatus } from "@/shared/ui/letterBox";
+import styles from "./GuessRow.module.css";
+
+interface GuessRowProps {
+  word: string;
+  statuses?: LetterStatus[];
+  wordLength?: number;
+}
+
+export default function GuessRow({
+  word,
+  statuses = [],
+  wordLength = 5,
+}: GuessRowProps) {
+  const letters = word.padEnd(wordLength).split("");
+
+  return (
+    <div className={styles.row}>
+      {letters.map((letter, idx) => (
+        <LetterBox
+          key={idx}
+          letter={letter}
+          status={statuses[idx] || "default"}
+        />
+      ))}
+    </div>
+  );
+}
+.row {
+  display: flex;
+  gap: 4px;
+}
+import GuessRow from "./GuessRow";
+export default GuessRow;
+import GuessInputRow from "@/features/guessInputRow";
+import "./App.css";
+
+export default function App() {
+  return (
+    <div style={{ padding: 20 }}>
+      <GuessInputRow
+        length={5}
+        onSubmit={(word) => {
+          console.log("Guess submitted:", word);
+        }}
+      />
+    </div>
+  );
+}
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+import App from "./ui/App";
+export default App;
