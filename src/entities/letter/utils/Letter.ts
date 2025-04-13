@@ -9,6 +9,11 @@ export interface LetterEncryptProgress {
   yellowHash?: Hash;
 }
 
+interface LetterHashProgress {
+  progress: number;
+  result?: Hash;
+}
+
 export default class Letter {
   readonly char: UppercaseLetter;
   readonly position: number;
@@ -18,18 +23,36 @@ export default class Letter {
     this.position = position;
   }
 
-  encrypt$(salt: string = '', iterations: number = 5000): Observable<LetterEncryptProgress> {
-    const greenInput = `${this.position}:${this.char}${salt}`; 
-    const yellowInput = `${this.char}${salt}`;
+  greenHash$(salt: string = '', iterations: number = 5000): Observable<LetterHashProgress> {
+    const input = `${this.position}:${this.char}${salt}`;
+    return this.hash$(input, iterations);
+  }
 
-    const green$ = heavyHash$(greenInput, iterations).pipe(shareReplay(1));
-    const yellow$ = heavyHash$(yellowInput, iterations).pipe(shareReplay(1));
+  yellowHash$(salt: string = '', iterations: number = 5000): Observable<LetterHashProgress> {
+    const input = `${this.char}${salt}`;
+    return this.hash$(input, iterations);
+  }
+
+  encrypt$(salt: string = '', iterations: number = 5000): Observable<LetterEncryptProgress> {
+    const green$ = this.greenHash$(salt, iterations);
+    const yellow$ = this.yellowHash$(salt, iterations);
 
     return combineLatest([green$, yellow$]).pipe(
       map(([green, yellow]) => ({
         progress: (green.progress + yellow.progress) / 2,
         greenHash: green.result,
         yellowHash: yellow.result,
+      })),
+      shareReplay(1)
+    );
+  }
+
+  private hash$(input: string, iterations: number): Observable<LetterHashProgress> {
+    return heavyHash$(input, iterations).pipe(
+      map(({ progress, result, ...rest }) => ({
+        progress,
+        result: progress === 1 ? result : undefined,
+        ...rest,
       })),
       shareReplay(1)
     );

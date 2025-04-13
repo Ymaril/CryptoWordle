@@ -1,4 +1,4 @@
-import { Observable, combineLatest, map } from "rxjs";
+import { Observable, combineLatest, map, shareReplay, takeWhile } from "rxjs";
 import { decodeBase64Url, encodeBase64Url } from "@/shared/utils";
 import type { Hash } from "@/shared/types";
 import Word from "./Word";
@@ -76,20 +76,32 @@ export default class EncryptedWord {
     progress: number;
     status: GuessedLetterStatus | null;
   }> {
-    return letter.encrypt$(this.salt, this.iterations).pipe(
-      map(({ progress, greenHash, yellowHash }) => {
-        if (!greenHash && !yellowHash) return { progress, status: null };
+    const green$ = letter.greenHash$(this.salt, this.iterations).pipe(shareReplay(1));
+    const yellow$ = letter.yellowHash$(this.salt, this.iterations).pipe(shareReplay(1));
+  
+    return combineLatest([green$, yellow$]).pipe(
+      map(([green, yellow]) => {
+        const greenHash = green.result;
+        const yellowHash = yellow.result;
 
-        if (greenHash && greenHash === this.greenHashes[letter.position]) {
-          return { progress, status: GuessedLetterStatus.Correct };
+        if (greenHash) {
+          if (greenHash === this.greenHashes[letter.position]) {
+            return { progress: 1, status: GuessedLetterStatus.Correct };
+          }
+  
+          if (yellowHash) {
+            if(this.yellowHashes.includes(yellowHash)) {
+              return { progress: 1, status: GuessedLetterStatus.Misplaced };
+            }
+
+            return { progress: 1, status: GuessedLetterStatus.Wrong };
+          }
         }
-
-        if (yellowHash && this.yellowHashes.includes(yellowHash)) {
-          return { progress, status: GuessedLetterStatus.Misplaced };
-        }
-
-        return { progress, status: GuessedLetterStatus.Wrong };
+  
+        return { progress: (green.progress + yellow.progress) / 2, status: null };
       }),
+      takeWhile(({ status }) => status === null, true),
+      shareReplay(1)
     );
   }
 }
