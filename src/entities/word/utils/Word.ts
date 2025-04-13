@@ -1,10 +1,8 @@
 import {
   combineLatest,
-  filter,
   map,
   Observable,
   shareReplay,
-  take,
 } from "rxjs";
 import { Letter, LetterEncryptProgress } from "@/entities/letter";
 import EncryptedWord from "./EncryptedWord";
@@ -20,37 +18,51 @@ export default class Word {
       .map((char, i) => new Letter(char as UppercaseLetter, i));
   }
 
-  lettersEncrypt$(): Observable<LetterEncryptProgress[]> {
-    return combineLatest(this.letters.map((l) => l.encrypt$())).pipe(
-      shareReplay(1),
-    );
+  lettersEncrypt$(salt: string = "", iterations: number = 5000): Observable<LetterEncryptProgress[]> {
+    return combineLatest(
+      this.letters.map((l) => l.encrypt$(salt, iterations))
+    ).pipe(shareReplay(1));
   }
 
-  encrypt$(): Observable<{
+  encrypt$(salt: string = "", iterations: number = 5000): Observable<{
     progress: number;
     letters: LetterEncryptProgress[];
   }> {
-    return this.lettersEncrypt$().pipe(
+    return this.lettersEncrypt$(salt, iterations).pipe(
       map((letters) => ({
         letters,
         progress:
           letters.reduce((sum, l) => sum + l.progress, 0) / letters.length,
       })),
-      shareReplay(1),
+      shareReplay(1)
     );
   }
 
-  toEncryptedWord$(): Observable<EncryptedWord> {
-    return this.lettersEncrypt$().pipe(
-      filter((letters) => letters.every((p) => p.progress === 1)),
-      take(1),
-      map(
-        (letters) =>
-          new EncryptedWord(
-            letters.map((p) => p.greenHash!),
-            letters.map((p) => p.yellowHash!),
-          ),
-      ),
+  toEncryptedWord$(
+    salt: string = "",
+    iterations: number = 5000
+  ): Observable<{
+    progress: number;
+    letters: LetterEncryptProgress[];
+    result?: EncryptedWord;
+  }> {
+    return this.encrypt$(salt, iterations).pipe(
+      map((encryptProgress) => {
+        const { progress, letters } = encryptProgress;
+
+        const allDone = progress === 1;
+        const result = allDone
+          ? new EncryptedWord(
+              letters.map((p) => p.greenHash!),
+              letters.map((p) => p.yellowHash!),
+              salt,
+              iterations
+            )
+          : undefined;
+  
+        return { result, ...encryptProgress };
+      }),
+      shareReplay(1)
     );
-  }
+  }  
 }

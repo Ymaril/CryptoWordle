@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { WordInput, Word } from "@/entities/word";
-import { EncryptedWord } from "@/entities/word";
 import styles from "./WordEncryptor.module.css";
+import { heavyHash$ } from "@/shared/utils";
 
 export default function WordEncryptor() {
   const [word, setWord] = useState<Word | null>(null);
@@ -9,6 +9,7 @@ export default function WordEncryptor() {
   const [letterProgresses, setLetterProgresses] = useState<number[]>([]);
   const [encoded, setEncoded] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [iterations, setIterations] = useState(5000);
 
   const handleSubmit = (text: string) => {
     const newWord = new Word(text);
@@ -22,24 +23,29 @@ export default function WordEncryptor() {
   useEffect(() => {
     if (!word) return;
 
-    const progressSub = word.encrypt$().subscribe(({ progress, letters }) => {
-      setProgress(progress);
-      setLetterProgresses(letters.map((l) => l.progress));
+    const plainText = word.letters.map((l) => l.char).join("");
+
+    const saltSub = heavyHash$(plainText, 1).subscribe(({ result: salt }) => {
+      if (!salt) return;
+
+      const sub = word.toEncryptedWord$(salt, iterations).subscribe(
+        ({ progress, letters, result }) => {
+          setProgress(progress);
+          setLetterProgresses(letters.map((l) => l.progress));
+
+          if (result) {
+            const hash = result.toBase64Url();
+            setEncoded(hash);
+            window.location.hash = hash;
+          }
+        }
+      );
+
+      return () => sub.unsubscribe();
     });
 
-    const resultSub = word
-      .toEncryptedWord$()
-      .subscribe((encrypted: EncryptedWord) => {
-        const hash = encrypted.toBase64Url();
-        setEncoded(hash);
-        window.location.hash = hash;
-      });
-
-    return () => {
-      progressSub.unsubscribe();
-      resultSub.unsubscribe();
-    };
-  }, [word]);
+    return () => saltSub.unsubscribe();
+  }, [word, iterations]);
 
   const baseUrl = `${window.location.origin}${window.location.pathname}`;
   const link = encoded ? `${baseUrl}#${encoded}` : "";
@@ -88,7 +94,7 @@ export default function WordEncryptor() {
               </div>
             </div>
           )}
-          
+
           <div>
             Encrypting progress:{" "}
             <span className={styles.progressValue}>
@@ -97,6 +103,19 @@ export default function WordEncryptor() {
           </div>
         </div>
       )}
+
+      <div className={styles.sliderWrapper}>
+        <input
+          type="range"
+          id="iterations"
+          min={500}
+          max={20000}
+          step={500}
+          value={iterations}
+          onChange={(e) => setIterations(Number(e.target.value))}
+          className={styles.slider}
+        />
+      </div>
       <WordInput onSubmit={handleSubmit} clearOnSubmit={false} />
     </div>
   );

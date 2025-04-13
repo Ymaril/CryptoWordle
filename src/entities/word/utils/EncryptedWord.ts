@@ -13,10 +13,14 @@ export interface CompareProgress {
 export default class EncryptedWord {
   readonly greenHashes: Hash[];
   readonly yellowHashes: Hash[];
+  readonly salt: string;
+  readonly iterations: number;
 
-  constructor(greenHashes: Hash[], yellowHashes: Hash[]) {
+  constructor(greenHashes: Hash[], yellowHashes: Hash[], salt: string = "", iterations: number = 5000) {
     this.greenHashes = greenHashes;
     this.yellowHashes = yellowHashes;
+    this.salt = salt;
+    this.iterations = iterations;
   }
 
   toBase64Url(): string {
@@ -24,13 +28,15 @@ export default class EncryptedWord {
       JSON.stringify({
         green: this.greenHashes,
         yellow: this.yellowHashes,
+        salt: this.salt,
+        iterations: this.iterations,
       }),
     );
   }
 
   static fromBase64Url(encoded: string): EncryptedWord {
-    const { green, yellow } = JSON.parse(decodeBase64Url(encoded));
-    return new EncryptedWord(green, yellow);
+    const { green, yellow, salt, iterations } = JSON.parse(decodeBase64Url(encoded));
+    return new EncryptedWord(green, yellow, salt, iterations);
   }
 
   checkWord$(word: Word): Observable<{
@@ -70,7 +76,7 @@ export default class EncryptedWord {
     progress: number;
     status: GuessedLetterStatus | null;
   }> {
-    return letter.encrypt$().pipe(
+    return letter.encrypt$(this.salt, this.iterations).pipe(
       map(({ progress, greenHash, yellowHash }) => {
         if (!greenHash && !yellowHash) return { progress, status: null };
 
