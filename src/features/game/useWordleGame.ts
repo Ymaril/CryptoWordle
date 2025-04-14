@@ -22,8 +22,7 @@ export default function useWordleGame(): UseWordleGame {
   }, []);
 
   const submitGuess = (guessText: string) => {
-    if (!targetEncrypted || guessText.length !== targetEncrypted.length)
-      return;
+    if (!targetEncrypted || guessText.length !== targetEncrypted.length) return;
 
     const guessWord = new Word(guessText);
 

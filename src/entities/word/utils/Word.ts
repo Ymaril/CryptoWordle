@@ -1,9 +1,4 @@
-import {
-  combineLatest,
-  map,
-  Observable,
-  shareReplay,
-} from "rxjs";
+import { combineLatest, map, Observable, shareReplay } from "rxjs";
 import { Letter, LetterEncryptProgress } from "@/entities/letter";
 import EncryptedWord from "./EncryptedWord";
 import type { Hash, UppercaseLetter } from "@/shared/types";
@@ -19,13 +14,19 @@ export default class Word {
       .map((char, i) => new Letter(char as UppercaseLetter, i));
   }
 
-  lettersEncrypt$(salt: string = "", iterations: number = 5000): Observable<LetterEncryptProgress[]> {
+  lettersEncrypt$(
+    salt: string = "",
+    iterations: number = 5000,
+  ): Observable<LetterEncryptProgress[]> {
     return combineLatest(
-      this.letters.map((l) => l.encrypt$(salt, iterations))
+      this.letters.map((l) => l.encrypt$(salt, iterations)),
     ).pipe(shareReplay(1));
   }
 
-  encrypt$(salt: string = "", iterations: number = 5000): Observable<{
+  encrypt$(
+    salt: string = "",
+    iterations: number = 5000,
+  ): Observable<{
     progress: number;
     letters: LetterEncryptProgress[];
   }> {
@@ -35,13 +36,13 @@ export default class Word {
         progress:
           letters.reduce((sum, l) => sum + l.progress, 0) / letters.length,
       })),
-      shareReplay(1)
+      shareReplay(1),
     );
   }
 
   toEncryptedWord$(
     salt: string = "",
-    iterations: number = 5000
+    iterations: number = 5000,
   ): Observable<{
     progress: number;
     letters: LetterEncryptProgress[];
@@ -57,30 +58,30 @@ export default class Word {
               letters.map((p) => p.greenHash!),
               this.prepareYellowHashes(letters.map((p) => p.yellowHash!)),
               salt,
-              iterations
+              iterations,
             )
           : undefined;
-  
+
         return { result, ...encryptProgress };
       }),
-      shareReplay(1)
+      shareReplay(1),
     );
   }
 
   private prepareYellowHashes(hashes: Hash[]): Hash[] {
     const seen = new Set(hashes);
     const numFakesNeeded = hashes.length - seen.size;
-  
+
     const fakeHashes = Array.from({ length: numFakesNeeded }, () =>
-      this.generateFakeHash(hashes[0].length)
+      this.generateFakeHash(hashes[0].length),
     );
-  
+
     return shuffleArray([...seen, ...fakeHashes]);
-  }  
+  }
 
   private generateFakeHash(length: number): string {
     return Array.from({ length }, () =>
-      Math.floor(Math.random() * 16).toString(16)
+      Math.floor(Math.random() * 16).toString(16),
     ).join("");
   }
 }

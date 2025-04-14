@@ -31,8 +31,9 @@ export default function WordEncryptor() {
     const saltSub = heavyHash$(plainText, 1).subscribe(({ result: salt }) => {
       if (!salt) return;
 
-      const sub = word.toEncryptedWord$(salt, iterations).subscribe(
-        ({ progress, letters, result }) => {
+      const sub = word
+        .toEncryptedWord$(salt, iterations)
+        .subscribe(({ progress, letters, result }) => {
           setProgress(progress);
           setLetterProgresses(letters.map((l) => l.progress));
 
@@ -41,8 +42,7 @@ export default function WordEncryptor() {
             setEncoded(hash);
             window.location.hash = hash;
           }
-        }
-      );
+        });
 
       return () => sub.unsubscribe();
     });

@@ -23,17 +23,26 @@ export default class Letter {
     this.position = position;
   }
 
-  greenHash$(salt: string = '', iterations: number = 5000): Observable<LetterHashProgress> {
+  greenHash$(
+    salt: string = "",
+    iterations: number = 5000,
+  ): Observable<LetterHashProgress> {
     const input = `${this.position}:${this.char}${salt}`;
     return this.hash$(input, iterations);
   }
 
-  yellowHash$(salt: string = '', iterations: number = 5000): Observable<LetterHashProgress> {
+  yellowHash$(
+    salt: string = "",
+    iterations: number = 5000,
+  ): Observable<LetterHashProgress> {
     const input = `${this.char}${salt}`;
     return this.hash$(input, iterations);
   }
 
-  encrypt$(salt: string = '', iterations: number = 5000): Observable<LetterEncryptProgress> {
+  encrypt$(
+    salt: string = "",
+    iterations: number = 5000,
+  ): Observable<LetterEncryptProgress> {
     const green$ = this.greenHash$(salt, iterations);
     const yellow$ = this.yellowHash$(salt, iterations);
 
@@ -43,18 +52,21 @@ export default class Letter {
         greenHash: green.result,
         yellowHash: yellow.result,
       })),
-      shareReplay(1)
+      shareReplay(1),
     );
   }
 
-  private hash$(input: string, iterations: number): Observable<LetterHashProgress> {
+  private hash$(
+    input: string,
+    iterations: number,
+  ): Observable<LetterHashProgress> {
     return heavyHash$(input, iterations).pipe(
       map(({ progress, result, ...rest }) => ({
         progress,
         result: progress === 1 ? result : undefined,
         ...rest,
       })),
-      shareReplay(1)
+      shareReplay(1),
     );
   }
 }

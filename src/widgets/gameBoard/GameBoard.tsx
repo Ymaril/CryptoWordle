@@ -4,13 +4,8 @@ import { WordInput, WordRow } from "@/entities/word";
 import styles from "./GameBoard.module.css";
 
 export default function GameBoard() {
-  const {
-    guessedWords,
-    isWin,
-    submitGuess,
-    checkProgress,
-    wordLength
-  } = useWordleGame();
+  const { guessedWords, isWin, submitGuess, checkProgress, wordLength } =
+    useWordleGame();
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
 

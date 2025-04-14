@@ -12,12 +12,12 @@ This game enforces that principle with **heavy hashing** and **stream-based vali
 
 ### ✨ What makes it unique?
 
-- Each letter is hashed using a salted, position-based strategy  
-- The hashing algorithm is intentionally expensive — to make guessing costly  
-- The encrypted word is encoded as a compact `base64url` string  
-- There is **no way to decrypt the original word**  
-- Guesses are validated **without revealing any internal state**  
-- **Reactive streams (RxJS)** power everything: encryption, progress, comparison  
+- Each letter is hashed using a salted, position-based strategy
+- The hashing algorithm is intentionally expensive — to make guessing costly
+- The encrypted word is encoded as a compact `base64url` string
+- There is **no way to decrypt the original word**
+- Guesses are validated **without revealing any internal state**
+- **Reactive streams (RxJS)** power everything: encryption, progress, comparison
 
 ---
 
@@ -45,7 +45,7 @@ http://localhost:3000
 
 ### 🛠️ Built With
 
-- ⚡️ **Vite** – modern build tool  
-- ⚛️ **React** + **TypeScript**  
-- 🔄 **RxJS** – fully reactive encryption and validation  
-- 🧮 **base64url** – safe and shareable encoded words  
+- ⚡️ **Vite** – modern build tool
+- ⚛️ **React** + **TypeScript**
+- 🔄 **RxJS** – fully reactive encryption and validation
+- 🧮 **base64url** – safe and shareable encoded words

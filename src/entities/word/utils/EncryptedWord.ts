@@ -16,7 +16,12 @@ export default class EncryptedWord {
   readonly salt: string;
   readonly iterations: number;
 
-  constructor(greenHashes: Hash[], yellowHashes: Hash[], salt: string = "", iterations: number = 5000) {
+  constructor(
+    greenHashes: Hash[],
+    yellowHashes: Hash[],
+    salt: string = "",
+    iterations: number = 5000,
+  ) {
     this.greenHashes = greenHashes;
     this.yellowHashes = yellowHashes;
     this.salt = salt;
@@ -39,7 +44,9 @@ export default class EncryptedWord {
   }
 
   static fromBase64Url(encoded: string): EncryptedWord {
-    const { green, yellow, salt, iterations } = JSON.parse(decodeBase64Url(encoded));
+    const { green, yellow, salt, iterations } = JSON.parse(
+      decodeBase64Url(encoded),
+    );
     return new EncryptedWord(green, yellow, salt, iterations);
   }
 
@@ -80,9 +87,13 @@ export default class EncryptedWord {
     progress: number;
     status: GuessedLetterStatus | null;
   }> {
-    const green$ = letter.greenHash$(this.salt, this.iterations).pipe(shareReplay(1));
-    const yellow$ = letter.yellowHash$(this.salt, this.iterations).pipe(shareReplay(1));
-  
+    const green$ = letter
+      .greenHash$(this.salt, this.iterations)
+      .pipe(shareReplay(1));
+    const yellow$ = letter
+      .yellowHash$(this.salt, this.iterations)
+      .pipe(shareReplay(1));
+
     return combineLatest([green$, yellow$]).pipe(
       map(([green, yellow]) => {
         const greenHash = green.result;
@@ -92,20 +103,23 @@ export default class EncryptedWord {
           if (greenHash === this.greenHashes[letter.position]) {
             return { progress: 1, status: GuessedLetterStatus.Correct };
           }
-  
+
           if (yellowHash) {
-            if(this.yellowHashes.includes(yellowHash)) {
+            if (this.yellowHashes.includes(yellowHash)) {
               return { progress: 1, status: GuessedLetterStatus.Misplaced };
             }
 
             return { progress: 1, status: GuessedLetterStatus.Wrong };
           }
         }
-  
-        return { progress: (green.progress + yellow.progress) / 2, status: null };
+
+        return {
+          progress: (green.progress + yellow.progress) / 2,
+          status: null,
+        };
       }),
       takeWhile(({ status }) => status === null, true),
-      shareReplay(1)
+      shareReplay(1),
     );
   }
 }
