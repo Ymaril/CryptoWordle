@@ -6,7 +6,8 @@ import {
 } from "rxjs";
 import { Letter, LetterEncryptProgress } from "@/entities/letter";
 import EncryptedWord from "./EncryptedWord";
-import type { UppercaseLetter } from "@/shared/types";
+import type { Hash, UppercaseLetter } from "@/shared/types";
+import { shuffleArray } from "@/shared/utils";
 
 export default class Word {
   readonly letters: Letter[];
@@ -54,7 +55,7 @@ export default class Word {
         const result = allDone
           ? new EncryptedWord(
               letters.map((p) => p.greenHash!),
-              letters.map((p) => p.yellowHash!),
+              this.prepareYellowHashes(letters.map((p) => p.yellowHash!)),
               salt,
               iterations
             )
@@ -64,5 +65,22 @@ export default class Word {
       }),
       shareReplay(1)
     );
+  }
+
+  private prepareYellowHashes(hashes: Hash[]): Hash[] {
+    const seen = new Set(hashes);
+    const numFakesNeeded = hashes.length - seen.size;
+  
+    const fakeHashes = Array.from({ length: numFakesNeeded }, () =>
+      this.generateFakeHash(hashes[0].length)
+    );
+  
+    return shuffleArray([...seen, ...fakeHashes]);
   }  
+
+  private generateFakeHash(length: number): string {
+    return Array.from({ length }, () =>
+      Math.floor(Math.random() * 16).toString(16)
+    ).join("");
+  }
 }
