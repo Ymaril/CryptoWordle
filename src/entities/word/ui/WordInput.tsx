@@ -4,14 +4,14 @@ import styles from "./WordInput.module.css";
 
 interface WordInputProps {
   onSubmit: (word: string) => void;
+  length: number;
   clearOnSubmit?: boolean;
   disabled?: boolean;
 }
 
-const LENGTH = 5;
-
 export default function WordInput({
   onSubmit,
+  length,
   clearOnSubmit = true,
   disabled = false,
 }: WordInputProps) {
@@ -23,7 +23,7 @@ export default function WordInput({
     const upper = val
       .toUpperCase()
       .replace(/[^A-Z]/g, "")
-      .slice(0, LENGTH);
+      .slice(0, length);
     setValue(upper);
   };
 
@@ -38,7 +38,7 @@ export default function WordInput({
       value={value}
       onChange={handleChange}
       onComplete={handleComplete}
-      length={LENGTH}
+      length={length}
       validChars="A-Za-z"
       placeholder=""
       autoFocus

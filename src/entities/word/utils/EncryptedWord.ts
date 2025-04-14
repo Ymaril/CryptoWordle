@@ -23,6 +23,10 @@ export default class EncryptedWord {
     this.iterations = iterations;
   }
 
+  get length(): number {
+    return this.greenHashes.length;
+  }
+
   toBase64Url(): string {
     return encodeBase64Url(
       JSON.stringify({

@@ -9,6 +9,7 @@ export default function GameBoard() {
     submitGuess,
     restart,
     checkProgress,
+    wordLength
   } = useWordleGame();
 
   return (
@@ -30,7 +31,7 @@ export default function GameBoard() {
       )}
 
       {!isGameOver && (
-        <WordInput onSubmit={submitGuess} disabled={checkProgress !== null} />
+        <WordInput onSubmit={submitGuess} disabled={checkProgress !== null} length={wordLength}/>
       )}
 
       {isGameOver && (

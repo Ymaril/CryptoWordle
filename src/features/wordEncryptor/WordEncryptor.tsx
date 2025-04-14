@@ -1,21 +1,24 @@
 import { useEffect, useState } from "react";
-import { WordInput, Word } from "@/entities/word";
 import styles from "./WordEncryptor.module.css";
 import { heavyHash$ } from "@/shared/utils";
+import { Word } from "@/entities/word";
 
 export default function WordEncryptor() {
   const [word, setWord] = useState<Word | null>(null);
+  const [inputText, setInputText] = useState("");
   const [progress, setProgress] = useState(0);
   const [letterProgresses, setLetterProgresses] = useState<number[]>([]);
   const [encoded, setEncoded] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [iterations, setIterations] = useState(5000);
 
-  const handleSubmit = (text: string) => {
-    const newWord = new Word(text);
+  const handleEncrypt = () => {
+    const clean = inputText.toUpperCase().replace(/[^A-Z]/g, "");
+    if (!clean) return;
+    const newWord = new Word(clean);
     setWord(newWord);
     setProgress(0);
-    setLetterProgresses(Array(text.length).fill(0));
+    setLetterProgresses(Array(clean.length).fill(0));
     setEncoded(null);
     setCopied(false);
   };
@@ -105,18 +108,31 @@ export default function WordEncryptor() {
       )}
 
       <div className={styles.sliderWrapper}>
+        <label htmlFor="iterations">Iterations: {iterations}</label>
         <input
           type="range"
           id="iterations"
           min={500}
           max={20000}
-          step={500}
+          step={5000}
           value={iterations}
           onChange={(e) => setIterations(Number(e.target.value))}
           className={styles.slider}
         />
       </div>
-      <WordInput onSubmit={handleSubmit} clearOnSubmit={false} />
+
+      <div className={styles.inputRow}>
+        <input
+          type="text"
+          placeholder="Enter any word"
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          className={styles.textInput}
+        />
+        <button onClick={handleEncrypt} className={styles.encryptButton}>
+          Encrypt
+        </button>
+      </div>
     </div>
   );
 }

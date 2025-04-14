@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { GuessedWord, Word, EncryptedWord } from "@/entities/word";
 
-const WORD_LENGTH = 5;
 const MAX_TRIES = 6;
 
 export default function useWordleGame(): UseWordleGame {
@@ -26,7 +25,7 @@ export default function useWordleGame(): UseWordleGame {
   }, []);
 
   const submitGuess = (guessText: string) => {
-    if (!targetEncrypted || isGameOver || guessText.length !== WORD_LENGTH)
+    if (!targetEncrypted || isGameOver || guessText.length !== targetEncrypted.length)
       return;
 
     const guessWord = new Word(guessText);
@@ -71,6 +70,7 @@ export default function useWordleGame(): UseWordleGame {
     checkProgress,
     submitGuess,
     restart,
+    wordLength: targetEncrypted?.length ?? 0,
   };
 }
 
@@ -82,4 +82,5 @@ export interface UseWordleGame {
   checkProgress: number | null;
   submitGuess: (guess: string) => void;
   restart: () => void;
+  wordLength: number;
 }
