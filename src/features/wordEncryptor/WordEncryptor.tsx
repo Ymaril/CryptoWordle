@@ -126,7 +126,10 @@ export default function WordEncryptor() {
           type="text"
           placeholder="Enter any word"
           value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
+          onChange={(e) => {
+            const cleaned = e.target.value.toUpperCase().replace(/[^A-Z]/g, "");
+            setInputText(cleaned);
+          }}
           className={styles.textInput}
         />
         <button onClick={handleEncrypt} className={styles.encryptButton}>
