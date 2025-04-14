@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
 import { GuessedWord, Word, EncryptedWord } from "@/entities/word";
 
-const MAX_TRIES = 6;
-
 export default function useWordleGame(): UseWordleGame {
   const [targetEncrypted, setTargetEncrypted] = useState<EncryptedWord | null>(
     null,
   );
   const [guessedWords, setGuessedWords] = useState<GuessedWord[]>([]);
   const [isWin, setIsWin] = useState(false);
-  const [isGameOver, setIsGameOver] = useState(false);
   const [checkProgress, setCheckProgress] = useState<number | null>(null);
 
   useEffect(() => {
@@ -25,7 +22,7 @@ export default function useWordleGame(): UseWordleGame {
   }, []);
 
   const submitGuess = (guessText: string) => {
-    if (!targetEncrypted || isGameOver || guessText.length !== targetEncrypted.length)
+    if (!targetEncrypted || guessText.length !== targetEncrypted.length)
       return;
 
     const guessWord = new Word(guessText);
@@ -39,12 +36,7 @@ export default function useWordleGame(): UseWordleGame {
           setGuessedWords((prev) => {
             const next = [...prev, result];
 
-            if (result.isCorrect()) {
-              setIsWin(true);
-              setIsGameOver(true);
-            } else if (next.length >= MAX_TRIES) {
-              setIsGameOver(true);
-            }
+            if (result.isCorrect()) setIsWin(true);
 
             return next;
           });
@@ -58,7 +50,6 @@ export default function useWordleGame(): UseWordleGame {
   const restart = () => {
     setGuessedWords([]);
     setIsWin(false);
-    setIsGameOver(false);
     setCheckProgress(null);
   };
 
@@ -66,7 +57,6 @@ export default function useWordleGame(): UseWordleGame {
     targetWord: targetEncrypted,
     guessedWords,
     isWin,
-    isGameOver,
     checkProgress,
     submitGuess,
     restart,
@@ -78,7 +68,6 @@ export interface UseWordleGame {
   targetWord: EncryptedWord | null;
   guessedWords: GuessedWord[];
   isWin: boolean;
-  isGameOver: boolean;
   checkProgress: number | null;
   submitGuess: (guess: string) => void;
   restart: () => void;
