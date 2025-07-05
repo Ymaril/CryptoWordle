@@ -20,7 +20,8 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "vite": ["./node_modules/vite"]
     }
   },
   "include": ["vite.config.ts"]

@@ -3,6 +3,8 @@ import { lastValueFrom } from "rxjs";
 import { EncryptedWord, Word } from "@/entities/word";
 import { GuessedLetterStatus } from "@/entities/letter";
 
+const { Correct, Misplaced, Wrong } = GuessedLetterStatus;
+
 // --- Hardcoded, DECODED test data ---
 const LEVEL_DECODED = {
   green: [
@@ -48,7 +50,8 @@ async function checkGuess(decodedData: any, guessWord: string) {
   );
   const guess = new Word(guessWord);
   const { result } = await lastValueFrom(encryptedWord.checkWord$(guess));
-  return result;
+  expect(result).toBeDefined();
+  return result!;
 }
 
 describe("CryptoWordle (Hardcoded, Decoded Tests)", () => {
@@ -61,11 +64,11 @@ describe("CryptoWordle (Hardcoded, Decoded Tests)", () => {
     it("should handle a mix of statuses", async () => {
       const result = await checkGuess(LEVEL_DECODED, "APPLE");
       expect(result.letters.map((l) => l.status)).toEqual([
-        GuessedLetterStatus.Wrong,
-        GuessedLetterStatus.Wrong,
-        GuessedLetterStatus.Wrong,
-        GuessedLetterStatus.Misplaced,
-        GuessedLetterStatus.Misplaced,
+        Wrong,
+        Wrong,
+        Wrong,
+        Misplaced,
+        Misplaced,
       ]);
     });
   });
@@ -74,11 +77,11 @@ describe("CryptoWordle (Hardcoded, Decoded Tests)", () => {
     it("should handle complex duplicates", async () => {
       const result = await checkGuess(SPOON_DECODED, "BOOKS");
       expect(result.letters.map((l) => l.status)).toEqual([
-        GuessedLetterStatus.Wrong,
-        GuessedLetterStatus.Misplaced,
-        GuessedLetterStatus.Correct,
-        GuessedLetterStatus.Wrong,
-        GuessedLetterStatus.Misplaced,
+        Wrong,
+        Misplaced,
+        Correct,
+        Wrong,
+        Misplaced,
       ]);
     });
   });
