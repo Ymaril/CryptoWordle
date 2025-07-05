@@ -61,7 +61,7 @@ describe("GameBoard Integration Test", () => {
     await waitFor(
       async () => {
         const row = await screen.findByRole("row");
-        const letters = await within(row).findAllByTestId("letter-box");
+        const letters = await within(row).findAllByRole("gridcell");
         const areAllWrong = letters.every((letter) =>
           letter.className.includes("wrong"),
         );
@@ -80,7 +80,7 @@ describe("GameBoard Integration Test", () => {
     await waitFor(
       async () => {
         const row = await screen.findByRole("row");
-        const letters = await within(row).findAllByTestId("letter-box");
+        const letters = await within(row).findAllByRole("gridcell");
         const areAllCorrect = letters.every((letter) =>
           letter.className.includes("correct"),
         );

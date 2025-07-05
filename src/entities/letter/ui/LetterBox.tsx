@@ -13,7 +13,7 @@ export default function LetterBox({ letter }: { letter: Letter }) {
   return (
     <div
       className={`${styles.box} ${STATUS_STYLES[status]}`}
-      data-testid="letter-box"
+      role="gridcell"
     >
       {char}
     </div>
