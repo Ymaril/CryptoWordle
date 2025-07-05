@@ -5,88 +5,80 @@ import { GuessedLetterStatus } from "@/entities/letter";
 
 const { Correct, Misplaced, Wrong } = GuessedLetterStatus;
 
-// --- Hardcoded, DECODED test data ---
-const HELLO_DECODED = {
-  green: [
+// --- Pre-initialized EncryptedWord instances for reuse ---
+const HELLO_ENCRYPTED = new EncryptedWord(
+  [
     "220183d83f83d4f46f81889590c73e2fa7f3d43bd183c663d19096238999e53d",
     "6467afe056efc9a2a99b5e17f2d9c39a545fadd78e64f0eb68a461039bacae0e",
     "7a094991b06472dd5cab5744f525acd19e7f2f760d3fc028c4e75cf928516446",
     "ab7953bae459d0898900179f742b864bf1a1a5ea1b3332298b3ca0fe424a98e4",
     "5f929543811239b900a6173312c5106370d1fdceaf2bbf1da3fbb56b8f96bf9b",
   ],
-  yellow: [
+  [
     "05fc87f3b30865616710a49519dcb60aa36ea7823aadb558ca447c785e9471f7",
     "197a886172d0340d383c0676e1a6b37e38961ab8875c5d934f47bd0a3e3d210d",
     "f7175ecadbd3f4449120d8c3c8060590d265d59236ee89e271b073c9601dbae4",
     "6d83a9f11c20cf316eac11c23b1ff34805988eb569864fb12c93580c87288f13",
     "8df55cbf61fed32171f601f2ff73897552c549d99c97a312d736a6c8c5ff6b6e",
   ],
-  salt: "test-salt",
-  iterations: 2,
-};
-
-const APPLE_DECODED = {
-  green: [
+  "test-salt",
+  2,
+);
+const APPLE_ENCRYPTED = new EncryptedWord(
+  [
     "4f078ae845b2b94fb645ee6c797690f5ff627c75077c56543522227d92771d50",
     "c3cd1eae0d358d4d242d999a3dc2371acdb6a79c5d680dbce96d0d4a4522aac6",
     "f9eea79c6658c0fb2571582b2e8028c7aae1ad827555f4727a2f9dfe77944915",
     "ab7953bae459d0898900179f742b864bf1a1a5ea1b3332298b3ca0fe424a98e4",
     "556098032924b13f1596f12e54c54306e54375bdba9cae5979c6f76d1864b61e",
   ],
-  yellow: [
+  [
     "e02e9a298a8c4f71645ff3b64f4f7931de8c0eba9679f596c815ff828220b67f",
     "9cd0bba922f0504349f696cd15e41af213e9c80ea6f31076f8ced81bdf330ae9",
     "05fc87f3b30865616710a49519dcb60aa36ea7823aadb558ca447c785e9471f7",
     "9823b542342402d0b8635226904c61a08c3fa49180bb068bb5d6c2cae35a60d3",
     "f7175ecadbd3f4449120d8c3c8060590d265d59236ee89e271b073c9601dbae4",
   ],
-  salt: "test-salt",
-  iterations: 2,
-};
-
-const LEVEL_DECODED = {
-  green: [
+  "test-salt",
+  2,
+);
+const LEVEL_ENCRYPTED = new EncryptedWord(
+  [
     "cd74d10e25d6382bcec902ec434c51d2de3c8910a24f7c9ef6ec2ff6c6635e50",
     "6467afe056efc9a2a99b5e17f2d9c39a545fadd78e64f0eb68a461039bacae0e",
     "192a72e655f922a2653a33bf5a9b027e6a4a6868346a227fdc6a4b99920fec67",
     "338f141ccb488a33df33e1423c436a44162f6039e7630e70cfd9ac9c4ddd40a4",
     "2ac9d068f668a4681daf4a50e1b466b09d59c48ca09bd313c12a44bbdd250d30",
   ],
-  yellow: [
+  [
     "f7175ecadbd3f4449120d8c3c8060590d265d59236ee89e271b073c9601dbae4",
     "05fc87f3b30865616710a49519dcb60aa36ea7823aadb558ca447c785e9471f7",
     "8b9499d7cf9ac2eef97661866261c694564d05ad035d1f41dbdd81b62c865b0c",
   ],
-  salt: "test-salt",
-  iterations: 2,
-};
-const SPOON_DECODED = {
-  green: [
+  "test-salt",
+  2,
+);
+const SPOON_ENCRYPTED = new EncryptedWord(
+  [
     "9adff0651c9a4a37bec4def95f3a2d25d2f80b73c2d324c464f69b47177c7466",
     "c3cd1eae0d358d4d242d999a3dc2371acdb6a79c5d680dbce96d0d4a4522aac6",
     "b0377c79af6e3c95574dcd1dcab09971b5b919bba19e133f36cd9bb53de03c9e",
     "1d1532ff2d3e0b77f32bccd8ad526a05333a81eaf5edc7d897688271c297dd77",
     "18b799f0d5a4a066dc4e513b7a8e5f57857e9c6b78466f81840bbdffde3f0ba6",
   ],
-  yellow: [
+  [
     "030f8a1e1d346616a79de396a0512463b0da45f9b1a408e5286439f50e1dbd10",
     "e02e9a298a8c4f71645ff3b64f4f7931de8c0eba9679f596c815ff828220b67f",
     "6d83a9f11c20cf316eac11c23b1ff34805988eb569864fb12c93580c87288f13",
     "213933cb0cc4e91421ba943f9bc055e6d4838e0d19702fdb930f6345a0920fb6",
   ],
-  salt: "test-salt",
-  iterations: 2,
-};
+  "test-salt",
+  2,
+);
 
 // ------------------------------------
 
-async function checkGuess(decodedData: any, guessWord: string) {
-  const encryptedWord = new EncryptedWord(
-    decodedData.green,
-    decodedData.yellow,
-    decodedData.salt,
-    decodedData.iterations,
-  );
+async function checkGuess(encryptedWord: EncryptedWord, guessWord: string) {
   const guess = new Word(guessWord);
   const { result } = await lastValueFrom(encryptedWord.checkWord$(guess));
   expect(result).toBeDefined();
@@ -96,12 +88,12 @@ async function checkGuess(decodedData: any, guessWord: string) {
 describe("CryptoWordle (Hardcoded, Decoded Tests)", () => {
   describe("Target: LEVEL", () => {
     it("should correctly identify a perfect match", async () => {
-      const result = await checkGuess(LEVEL_DECODED, "LEVEL");
+      const result = await checkGuess(LEVEL_ENCRYPTED, "LEVEL");
       expect(result.isCorrect()).toBe(true);
     });
 
     it("should handle a mix of statuses", async () => {
-      const result = await checkGuess(LEVEL_DECODED, "APPLE");
+      const result = await checkGuess(LEVEL_ENCRYPTED, "APPLE");
       expect(result.letters.map((l) => l.status)).toEqual([
         Wrong,
         Wrong,
@@ -114,7 +106,7 @@ describe("CryptoWordle (Hardcoded, Decoded Tests)", () => {
 
   describe("Target: SPOON", () => {
     it("should handle complex duplicates", async () => {
-      const result = await checkGuess(SPOON_DECODED, "BOOKS");
+      const result = await checkGuess(SPOON_ENCRYPTED, "BOOKS");
       expect(result.letters.map((l) => l.status)).toEqual([
         Wrong,
         Misplaced,
@@ -127,7 +119,7 @@ describe("CryptoWordle (Hardcoded, Decoded Tests)", () => {
 
   describe("Target: HELLO (H-E-L-L-O)", () => {
     it("Guess: LEVEL (L-E-V-E-L) - should follow the implemented hash-checking logic", async () => {
-      const result = await checkGuess(HELLO_DECODED, "LEVEL");
+      const result = await checkGuess(HELLO_ENCRYPTED, "LEVEL");
       expect(result.letters.map((l) => l.status)).toEqual([
         Misplaced,
         Correct,
@@ -140,7 +132,7 @@ describe("CryptoWordle (Hardcoded, Decoded Tests)", () => {
 
   describe("Target: APPLE (A-P-P-L-E)", () => {
     it("Guess: POPPY (P-O-P-P-Y) - should follow the implemented hash-checking logic", async () => {
-      const result = await checkGuess(APPLE_DECODED, "POPPY");
+      const result = await checkGuess(APPLE_ENCRYPTED, "POPPY");
       expect(result.letters.map((l) => l.status)).toEqual([
         Misplaced,
         Wrong,
