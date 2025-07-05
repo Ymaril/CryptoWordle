@@ -1,54 +1,39 @@
-import { Observable, combineLatest, map, shareReplay, takeWhile } from "rxjs";
+import { Observable, combineLatest, map, of, switchMap } from "rxjs";
 import { decodeBase64Url, encodeBase64Url } from "@/shared/utils";
-import type { Hash as HashString } from "@/shared/types";
-import { Hash } from "@/shared/utils";
 import Word from "./Word";
 import { GuessedLetterStatus, Letter } from "@/entities/letter";
 import GuessedWord from "./GuessedWord";
-
-export interface CompareProgress {
-  progress: number;
-  result?: GuessedWord;
-}
+import GreenHash from "./GreenHash";
+import YellowCollection from "./YellowCollection";
+import Hash from "@/shared/utils/Hash";
 
 export default class EncryptedWord {
-  readonly greenHashes: Hash[];
-  readonly yellowHashes: Hash[];
-  readonly salt: string;
-  readonly iterations: number;
+  readonly greenHashes: GreenHash[];
+  readonly yellowCollection: YellowCollection;
 
-  constructor(
-    greenHashes: HashString[],
-    yellowHashes: HashString[],
-    salt: string = "",
-    iterations: number = 5000,
-  ) {
-    this.greenHashes = greenHashes.map((h) => new Hash(h));
-    this.yellowHashes = yellowHashes.map((h) => new Hash(h));
-    this.salt = salt;
-    this.iterations = iterations;
+  constructor(greenHashes: GreenHash[], yellowCollection: YellowCollection) {
+    this.greenHashes = greenHashes;
+    this.yellowCollection = yellowCollection;
   }
 
   get length(): number {
     return this.greenHashes.length;
   }
 
-  toBase64Url(length: number = 64): string {
-    return encodeBase64Url(
-      JSON.stringify({
-        green: this.greenHashes.map((h) => h.toString(length)),
-        yellow: this.yellowHashes.map((h) => h.toString(length)),
-        salt: this.salt,
-        iterations: this.iterations,
-      }),
-    );
+  toBase64Url(length?: number): string {
+    const data = {
+      green: this.greenHashes.map((h) => h.toJSON(length)),
+      yellow: this.yellowCollection.toJSON(length),
+    };
+    return encodeBase64Url(JSON.stringify(data));
   }
 
   static fromBase64Url(encoded: string): EncryptedWord {
-    const { green, yellow, salt, iterations } = JSON.parse(
-      decodeBase64Url(encoded),
+    const { green, yellow } = JSON.parse(decodeBase64Url(encoded));
+    return new EncryptedWord(
+      green.map(GreenHash.fromJSON),
+      YellowCollection.fromJSON(yellow),
     );
-    return new EncryptedWord(green, yellow, salt, iterations);
   }
 
   checkWord$(word: Word): Observable<{
@@ -88,39 +73,34 @@ export default class EncryptedWord {
     progress: number;
     status: GuessedLetterStatus | null;
   }> {
-    const green$ = letter
-      .greenHash$(this.salt, this.iterations)
-      .pipe(shareReplay(1));
-    const yellow$ = letter
-      .yellowHash$(this.salt, this.iterations)
-      .pipe(shareReplay(1));
+    const greenHashToCompare = this.greenHashes[letter.position];
 
-    return combineLatest([green$, yellow$]).pipe(
-      map(([green, yellow]) => {
-        const greenHash = green.result;
-        const yellowHash = yellow.result;
+    const greenCheck$ = GreenHash.create$(
+      letter,
+      greenHashToCompare.salt,
+      greenHashToCompare.iterations,
+    );
 
-        if (greenHash) {
-          if (this.greenHashes[letter.position].equals(greenHash)) {
-            return { progress: 1, status: GuessedLetterStatus.Correct };
-          }
+    const yellowCheck$ = this.yellowCollection.contains$(letter);
 
-          if (yellowHash) {
-            if (this.yellowHashes.some((h) => h.equals(yellowHash))) {
-              return { progress: 1, status: GuessedLetterStatus.Misplaced };
-            }
+    return combineLatest([greenCheck$, yellowCheck$]).pipe(
+      map(([greenProgress, yellowProgress]) => {
+        const progress = (greenProgress.progress + yellowProgress.progress) / 2;
 
-            return { progress: 1, status: GuessedLetterStatus.Wrong };
-          }
+        if (progress < 1) {
+          return { progress, status: null };
         }
 
-        return {
-          progress: (green.progress + yellow.progress) / 2,
-          status: null,
-        };
+        if (greenHashToCompare.equals(greenProgress.result!)) {
+          return { progress: 1, status: GuessedLetterStatus.Correct };
+        }
+
+        if (yellowProgress.result) {
+          return { progress: 1, status: GuessedLetterStatus.Misplaced };
+        }
+
+        return { progress: 1, status: GuessedLetterStatus.Wrong };
       }),
-      takeWhile(({ status }) => status === null, true),
-      shareReplay(1),
     );
   }
 }

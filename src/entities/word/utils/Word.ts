@@ -1,8 +1,15 @@
-import { combineLatest, map, Observable, shareReplay } from "rxjs";
-import { Letter, LetterEncryptProgress } from "@/entities/letter";
+import { combineLatest, map, Observable } from "rxjs";
+import { Letter } from "@/entities/letter";
 import EncryptedWord from "./EncryptedWord";
-import type { Hash, UppercaseLetter } from "@/shared/types";
-import { shuffleArray } from "@/shared/utils";
+import type { UppercaseLetter } from "@/shared/types";
+import GreenHash from "./GreenHash";
+import YellowCollection from "./YellowCollection";
+
+export interface WordEncryptionProgress {
+  progress: number;
+  letterProgresses: { green: number; yellow: number }[];
+  result?: EncryptedWord;
+}
 
 export default class Word {
   readonly letters: Letter[];
@@ -14,74 +21,46 @@ export default class Word {
       .map((char, i) => new Letter(char as UppercaseLetter, i));
   }
 
-  lettersEncrypt$(
-    salt: string = "",
-    iterations: number = 5000,
-  ): Observable<LetterEncryptProgress[]> {
-    return combineLatest(
-      this.letters.map((l) => l.encrypt$(salt, iterations)),
-    ).pipe(shareReplay(1));
-  }
-
-  encrypt$(
-    salt: string = "",
-    iterations: number = 5000,
-  ): Observable<{
-    progress: number;
-    letters: LetterEncryptProgress[];
-  }> {
-    return this.lettersEncrypt$(salt, iterations).pipe(
-      map((letters) => ({
-        letters,
-        progress:
-          letters.reduce((sum, l) => sum + l.progress, 0) / letters.length,
-      })),
-      shareReplay(1),
-    );
-  }
-
   toEncryptedWord$(
-    salt: string = "",
-    iterations: number = 5000,
-  ): Observable<{
-    progress: number;
-    letters: LetterEncryptProgress[];
-    result?: EncryptedWord;
-  }> {
-    return this.encrypt$(salt, iterations).pipe(
-      map((encryptProgress) => {
-        const { progress, letters } = encryptProgress;
+    salt: string,
+    iterations: number,
+  ): Observable<WordEncryptionProgress> {
+    const greenHashes$ = combineLatest(
+      this.letters.map((letter) => GreenHash.create$(letter, salt, iterations)),
+    );
 
-        const allDone = progress === 1;
-        const result = allDone
-          ? new EncryptedWord(
-              letters.map((p) => p.greenHash!),
-              this.prepareYellowHashes(letters.map((p) => p.yellowHash!)),
-              salt,
-              iterations,
-            )
-          : undefined;
+    const yellowCollection$ = YellowCollection.create$(this, salt, iterations);
 
-        return { result, ...encryptProgress };
+    return combineLatest([greenHashes$, yellowCollection$]).pipe(
+      map(([greenProgresses, yellowProgress]) => {
+        const greenLetterProgresses = greenProgresses.map((p) => p.progress);
+        const yellowLetterProgresses = yellowProgress.letterProgresses;
+
+        const overallGreenProgress =
+          greenLetterProgresses.reduce((s, p) => s + p, 0) /
+          greenLetterProgresses.length;
+        const progress =
+          (overallGreenProgress + yellowProgress.progress) / 2;
+
+        const letterProgresses = this.letters.map((_, i) => ({
+          green: greenLetterProgresses[i],
+          yellow: yellowLetterProgresses[i],
+        }));
+
+        const result =
+          progress === 1
+            ? new EncryptedWord(
+                greenProgresses.map((p) => p.result!),
+                yellowProgress.result!,
+              )
+            : undefined;
+
+        return {
+          progress,
+          letterProgresses,
+          result,
+        };
       }),
-      shareReplay(1),
     );
-  }
-
-  private prepareYellowHashes(hashes: Hash[]): Hash[] {
-    const seen = new Set(hashes);
-    const numFakesNeeded = hashes.length - seen.size;
-
-    const fakeHashes = Array.from({ length: numFakesNeeded }, () =>
-      this.generateFakeHash(hashes[0].length),
-    );
-
-    return shuffleArray([...seen, ...fakeHashes]);
-  }
-
-  private generateFakeHash(length: number): string {
-    return Array.from({ length }, () =>
-      Math.floor(Math.random() * 16).toString(16),
-    ).join("");
   }
 }

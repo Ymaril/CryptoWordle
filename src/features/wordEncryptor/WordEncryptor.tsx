@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import styles from "./WordEncryptor.module.css";
 import { heavyHash$ } from "@/shared/utils";
 import { Word } from "@/entities/word";
+import { WordEncryptionProgress } from "@/entities/word/utils/Word";
 
 export default function WordEncryptor() {
   const [word, setWord] = useState<Word | null>(null);
   const [inputText, setInputText] = useState("");
-  const [progress, setProgress] = useState(0);
-  const [letterProgresses, setLetterProgresses] = useState<number[]>([]);
+  const [progress, setProgress] = useState<WordEncryptionProgress | null>(null);
   const [encoded, setEncoded] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [iterations, setIterations] = useState(5000);
@@ -18,8 +18,7 @@ export default function WordEncryptor() {
     if (!clean) return;
     const newWord = new Word(clean);
     setWord(newWord);
-    setProgress(0);
-    setLetterProgresses(Array(clean.length).fill(0));
+    setProgress(null);
     setEncoded(null);
     setCopied(false);
   };
@@ -29,24 +28,27 @@ export default function WordEncryptor() {
 
     const plainText = word.letters.map((l) => l.char).join("");
 
-    const saltSub = heavyHash$(plainText, 1).subscribe(({ result: salt }) => {
-      if (!salt) return;
+    const saltSub = heavyHash$(plainText, 1).subscribe(
+      ({ result: salt }) => {
+        if (!salt) return;
 
-      const sub = word
-        .toEncryptedWord$(salt, iterations)
-        .subscribe(({ progress, letters, result }) => {
-          setProgress(progress);
-          setLetterProgresses(letters.map((l) => l.progress));
+        const shortSalt = salt.substring(0, 8);
 
-          if (result) {
-            const hash = result.toBase64Url(hashLength);
-            setEncoded(hash);
-            window.location.hash = hash;
-          }
-        });
+        const sub = word
+          .toEncryptedWord$(shortSalt, iterations)
+          .subscribe((progress) => {
+            setProgress(progress);
 
-      return () => sub.unsubscribe();
-    });
+            if (progress.result) {
+              const hash = progress.result.toBase64Url(hashLength);
+              setEncoded(hash);
+              window.location.hash = hash;
+            }
+          });
+
+        return () => sub.unsubscribe();
+      },
+    );
 
     return () => saltSub.unsubscribe();
   }, [word, iterations, hashLength]);
@@ -86,13 +88,13 @@ export default function WordEncryptor() {
             </div>
           )}
 
-          {letterProgresses.length > 0 && (
+          {(progress?.letterProgresses || []).length > 0 && (
             <div className={styles.letterProgress}>
               <div>Progress per letter:</div>
               <div className={styles.letterList}>
-                {letterProgresses.map((p, i) => (
+                {progress?.letterProgresses.map((p, i) => (
                   <div key={i} className={styles.letterBox}>
-                    {Math.round(p * 100)}%
+                    {Math.round((p.green + p.yellow)/2 * 100)}%
                   </div>
                 ))}
               </div>
@@ -102,7 +104,7 @@ export default function WordEncryptor() {
           <div>
             Encrypting progress:{" "}
             <span className={styles.progressValue}>
-              {Math.round(progress * 100)}%
+              {Math.round((progress?.progress || 0) * 100)}%
             </span>
           </div>
         </div>
