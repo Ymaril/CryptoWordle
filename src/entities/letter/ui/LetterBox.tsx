@@ -10,5 +10,12 @@ const STATUS_STYLES = {
 export default function LetterBox({ letter }: { letter: Letter }) {
   const { char, status } = letter;
 
-  return <div className={`${styles.box} ${STATUS_STYLES[status]}`}>{char}</div>;
+  return (
+    <div
+      className={`${styles.box} ${STATUS_STYLES[status]}`}
+      data-testid="letter-box"
+    >
+      {char}
+    </div>
+  );
 }
