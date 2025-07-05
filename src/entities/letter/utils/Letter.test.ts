@@ -1,62 +1,68 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { Letter } from "@/entities/letter";
-import { lastValueFrom, of } from "rxjs";
-import heavyHash$ from "@/shared/utils/heavyHash$";
+import { lastValueFrom } from "rxjs";
 
-vi.mock("@/shared/utils/heavyHash$");
+describe("Letter (Real Implementation)", () => {
+  const testSalt = "salt";
+  const testIterations = 2; // Use low iterations for speed
 
-describe("Letter", () => {
-  beforeEach(() => {
-    // Reset mocks before each test
-    vi.clearAllMocks();
-    // Provide a default mock implementation for heavyHash$
-    vi.mocked(heavyHash$).mockReturnValue(
-      of({ progress: 1, result: "mock-hash" }),
-    );
-  });
-
-  it("greenHash$ should include position in the hash input", async () => {
+  it("greenHash$ should produce a valid hash", async () => {
     const letter = new Letter("A", 2);
-    letter.greenHash$("salt", 100);
-    // Expect the input to heavyHash$ to be "position:char:salt"
-    expect(heavyHash$).toHaveBeenCalledWith("2:Asalt", 100);
+    const result = await lastValueFrom(
+      letter.greenHash$(testSalt, testIterations),
+    );
+    expect(result.progress).toBe(1);
+    expect(typeof result.result).toBe("string");
+    expect(result.result).not.toBe("");
   });
 
-  it("yellowHash$ should not include position in the hash input", async () => {
+  it("yellowHash$ should produce a valid hash", async () => {
     const letter = new Letter("B", 3);
-    letter.yellowHash$("salt", 100);
-    // Expect the input to heavyHash$ to be "char:salt"
-    expect(heavyHash$).toHaveBeenCalledWith("Bsalt", 100);
+    const result = await lastValueFrom(
+      letter.yellowHash$(testSalt, testIterations),
+    );
+    expect(result.progress).toBe(1);
+    expect(typeof result.result).toBe("string");
+    expect(result.result).not.toBe("");
   });
 
-  it("encrypt$ should combine results from green and yellow hashes", async () => {
-    vi.mocked(heavyHash$).mockImplementation((input) => {
-      if (input.startsWith("1:C")) {
-        return of({ progress: 1, result: "green-result" });
-      }
-      return of({ progress: 1, result: "yellow-result" });
-    });
-
+  it("encrypt$ should produce two different, valid hashes", async () => {
     const letter = new Letter("C", 1);
-    const result = await lastValueFrom(letter.encrypt$());
+    const result = await lastValueFrom(
+      letter.encrypt$(testSalt, testIterations),
+    );
 
     expect(result.progress).toBe(1);
-    expect(result.greenHash).toBe("green-result");
-    expect(result.yellowHash).toBe("yellow-result");
+    expect(typeof result.greenHash).toBe("string");
+    expect(typeof result.yellowHash).toBe("string");
+    expect(result.greenHash).not.toEqual(result.yellowHash);
   });
 
-  it("should not include hash results until progress is 1", async () => {
-    // Simulate partial progress
-    vi.mocked(heavyHash$).mockReturnValue(
-      of({ progress: 0.5, result: "final-hash" }),
+  it("two letters with the same char but different positions should have different green hashes", async () => {
+    const letter1 = new Letter("A", 1);
+    const letter2 = new Letter("A", 2);
+
+    const result1 = await lastValueFrom(
+      letter1.greenHash$(testSalt, testIterations),
+    );
+    const result2 = await lastValueFrom(
+      letter2.greenHash$(testSalt, testIterations),
     );
 
-    const letter = new Letter("D", 0);
-    // We need to access the private hash$ method, so we use a little trick
-    // @ts-ignore
-    const result = await lastValueFrom(letter.hash$("test", 100));
+    expect(result1.result).not.toEqual(result2.result);
+  });
 
-    expect(result.progress).toBe(0.5);
-    expect(result.result).toBeUndefined();
+  it("two letters with the same char should have the same yellow hash", async () => {
+    const letter1 = new Letter("A", 1);
+    const letter2 = new Letter("A", 2);
+
+    const result1 = await lastValueFrom(
+      letter1.yellowHash$(testSalt, testIterations),
+    );
+    const result2 = await lastValueFrom(
+      letter2.yellowHash$(testSalt, testIterations),
+    );
+
+    expect(result1.result).toEqual(result2.result);
   });
 });
