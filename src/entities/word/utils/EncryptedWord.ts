@@ -1,6 +1,7 @@
 import { Observable, combineLatest, map, shareReplay, takeWhile } from "rxjs";
 import { decodeBase64Url, encodeBase64Url } from "@/shared/utils";
-import type { Hash } from "@/shared/types";
+import type { Hash as HashString } from "@/shared/types";
+import { Hash } from "@/shared/utils";
 import Word from "./Word";
 import { GuessedLetterStatus, Letter } from "@/entities/letter";
 import GuessedWord from "./GuessedWord";
@@ -17,13 +18,13 @@ export default class EncryptedWord {
   readonly iterations: number;
 
   constructor(
-    greenHashes: Hash[],
-    yellowHashes: Hash[],
+    greenHashes: HashString[],
+    yellowHashes: HashString[],
     salt: string = "",
     iterations: number = 5000,
   ) {
-    this.greenHashes = greenHashes;
-    this.yellowHashes = yellowHashes;
+    this.greenHashes = greenHashes.map((h) => new Hash(h));
+    this.yellowHashes = yellowHashes.map((h) => new Hash(h));
     this.salt = salt;
     this.iterations = iterations;
   }
@@ -35,8 +36,19 @@ export default class EncryptedWord {
   toBase64Url(): string {
     return encodeBase64Url(
       JSON.stringify({
-        green: this.greenHashes,
-        yellow: this.yellowHashes,
+        green: this.greenHashes.map(String),
+        yellow: this.yellowHashes.map(String),
+        salt: this.salt,
+        iterations: this.iterations,
+      }),
+    );
+  }
+
+  toBase64UrlWithTruncatedHashes(length: number): string {
+    return encodeBase64Url(
+      JSON.stringify({
+        green: this.greenHashes.map((h) => h.toString().substring(0, length)),
+        yellow: this.yellowHashes.map((h) => h.toString().substring(0, length)),
         salt: this.salt,
         iterations: this.iterations,
       }),
@@ -100,12 +112,12 @@ export default class EncryptedWord {
         const yellowHash = yellow.result;
 
         if (greenHash) {
-          if (greenHash === this.greenHashes[letter.position]) {
+          if (this.greenHashes[letter.position].equals(greenHash)) {
             return { progress: 1, status: GuessedLetterStatus.Correct };
           }
 
           if (yellowHash) {
-            if (this.yellowHashes.includes(yellowHash)) {
+            if (this.yellowHashes.some((h) => h.equals(yellowHash))) {
               return { progress: 1, status: GuessedLetterStatus.Misplaced };
             }
 

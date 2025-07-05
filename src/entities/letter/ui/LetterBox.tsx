@@ -11,10 +11,7 @@ export default function LetterBox({ letter }: { letter: Letter }) {
   const { char, status } = letter;
 
   return (
-    <div
-      className={`${styles.box} ${STATUS_STYLES[status]}`}
-      role="gridcell"
-    >
+    <div className={`${styles.box} ${STATUS_STYLES[status]}`} role="gridcell">
       {char}
     </div>
   );

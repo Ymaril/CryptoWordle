@@ -176,8 +176,12 @@ describe("EncryptedWord Functionality", () => {
     const restoredEncryptedWord = EncryptedWord.fromBase64Url(base64UrlString);
 
     // Check that the restored object is identical to the original
-    expect(restoredEncryptedWord.greenHashes).toEqual(originalData.green);
-    expect(restoredEncryptedWord.yellowHashes).toEqual(originalData.yellow);
+    expect(restoredEncryptedWord.greenHashes.map(String)).toEqual(
+      originalData.green,
+    );
+    expect(restoredEncryptedWord.yellowHashes.map(String)).toEqual(
+      originalData.yellow,
+    );
     expect(restoredEncryptedWord.salt).toBe(originalData.salt);
     expect(restoredEncryptedWord.iterations).toBe(originalData.iterations);
   });

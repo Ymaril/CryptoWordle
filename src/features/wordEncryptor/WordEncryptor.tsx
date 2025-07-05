@@ -11,6 +11,7 @@ export default function WordEncryptor() {
   const [encoded, setEncoded] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [iterations, setIterations] = useState(5000);
+  const [hashLength, setHashLength] = useState(8);
 
   const handleEncrypt = () => {
     const clean = inputText.toUpperCase().replace(/[^A-Z]/g, "");
@@ -38,9 +39,14 @@ export default function WordEncryptor() {
           setLetterProgresses(letters.map((l) => l.progress));
 
           if (result) {
-            const hash = result.toBase64Url();
-            setEncoded(hash);
-            window.location.hash = hash;
+            const fullHash = result.toBase64Url();
+            // Manually truncate the hash for the URL if needed
+            const finalHash =
+              hashLength < 64
+                ? result.toBase64UrlWithTruncatedHashes(hashLength)
+                : fullHash;
+            setEncoded(finalHash);
+            window.location.hash = finalHash;
           }
         });
 
@@ -48,7 +54,7 @@ export default function WordEncryptor() {
     });
 
     return () => saltSub.unsubscribe();
-  }, [word, iterations]);
+  }, [word, iterations, hashLength]);
 
   const baseUrl = `${window.location.origin}${window.location.pathname}`;
   const link = encoded ? `${baseUrl}#${encoded}` : "";
@@ -117,6 +123,22 @@ export default function WordEncryptor() {
           step={5000}
           value={iterations}
           onChange={(e) => setIterations(Number(e.target.value))}
+          className={styles.slider}
+        />
+      </div>
+
+      <div className={styles.sliderWrapper}>
+        <label htmlFor="hashLength">
+          Hash Length: {hashLength === 64 ? "Full" : hashLength}
+        </label>
+        <input
+          type="range"
+          id="hashLength"
+          min={8}
+          max={64}
+          step={8}
+          value={hashLength}
+          onChange={(e) => setHashLength(Number(e.target.value))}
           className={styles.slider}
         />
       </div>
