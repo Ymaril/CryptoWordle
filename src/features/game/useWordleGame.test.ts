@@ -98,4 +98,25 @@ describe("useWordleGame Hook", () => {
     expect(result.current.isWin).toBe(false);
     expect(result.current.checkProgress).toBeNull();
   });
+
+  it("should correctly process multiple incorrect guesses", async () => {
+    window.location.hash = `#${LEVEL_B64}`;
+    const { result } = renderHook(() => useWordleGame());
+    await waitFor(() => expect(result.current.wordLength).toBe(5));
+
+    const incorrectGuesses = ["APPLE", "GRAPE", "MANGO"];
+
+    for (const guess of incorrectGuesses) {
+      act(() => {
+        result.current.submitGuess(guess);
+      });
+    }
+
+    await waitFor(() => {
+      // After multiple incorrect guesses, the game should not be won,
+      // and the guessed words should be in the history.
+      expect(result.current.guessedWords).toHaveLength(incorrectGuesses.length);
+      expect(result.current.isWin).toBe(false);
+    });
+  });
 });
