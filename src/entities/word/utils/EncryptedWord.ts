@@ -33,22 +33,11 @@ export default class EncryptedWord {
     return this.greenHashes.length;
   }
 
-  toBase64Url(): string {
+  toBase64Url(length: number = 64): string {
     return encodeBase64Url(
       JSON.stringify({
-        green: this.greenHashes.map(String),
-        yellow: this.yellowHashes.map(String),
-        salt: this.salt,
-        iterations: this.iterations,
-      }),
-    );
-  }
-
-  toBase64UrlWithTruncatedHashes(length: number): string {
-    return encodeBase64Url(
-      JSON.stringify({
-        green: this.greenHashes.map((h) => h.toString().substring(0, length)),
-        yellow: this.yellowHashes.map((h) => h.toString().substring(0, length)),
+        green: this.greenHashes.map((h) => h.toString(length)),
+        yellow: this.yellowHashes.map((h) => h.toString(length)),
         salt: this.salt,
         iterations: this.iterations,
       }),

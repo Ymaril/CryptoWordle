@@ -26,9 +26,10 @@ export default class Hash {
   }
 
   /**
-   * Returns the full string value of the hash.
+   * Returns the string value of the hash, optionally truncated.
+   * @param length The desired length of the hash string.
    */
-  toString(): string {
-    return this.value;
+  toString(length: number = 64): string {
+    return this.value.substring(0, length);
   }
 }

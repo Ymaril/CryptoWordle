@@ -39,14 +39,9 @@ export default function WordEncryptor() {
           setLetterProgresses(letters.map((l) => l.progress));
 
           if (result) {
-            const fullHash = result.toBase64Url();
-            // Manually truncate the hash for the URL if needed
-            const finalHash =
-              hashLength < 64
-                ? result.toBase64UrlWithTruncatedHashes(hashLength)
-                : fullHash;
-            setEncoded(finalHash);
-            window.location.hash = finalHash;
+            const hash = result.toBase64Url(hashLength);
+            setEncoded(hash);
+            window.location.hash = hash;
           }
         });
 
