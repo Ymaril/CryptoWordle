@@ -143,3 +143,42 @@ describe("CryptoWordle (Hardcoded, Decoded Tests)", () => {
     }, 10000);
   });
 });
+
+describe("EncryptedWord Functionality", () => {
+  it("should correctly encode to Base64Url and decode back to the original object", () => {
+    const originalData = {
+      green: [
+        "220183d83f83d4f46f81889590c73e2fa7f3d43bd183c663d19096238999e53d",
+        "6467afe056efc9a2a99b5e17f2d9c39a545fadd78e64f0eb68a461039bacae0e",
+      ],
+      yellow: [
+        "05fc87f3b30865616710a49519dcb60aa36ea7823aadb558ca447c785e9471f7",
+        "197a886172d0340d383c0676e1a6b37e38961ab8875c5d934f47bd0a3e3d210d",
+      ],
+      salt: "test-salt-functional",
+      iterations: 1234,
+    };
+
+    const encryptedWord = new EncryptedWord(
+      originalData.green,
+      originalData.yellow,
+      originalData.salt,
+      originalData.iterations,
+    );
+
+    const base64UrlString = encryptedWord.toBase64Url();
+
+    // Check that the output is a valid base64url string (no +, /, or = characters)
+    expect(base64UrlString).not.toContain("+");
+    expect(base64UrlString).not.toContain("/");
+    expect(base64UrlString).not.toContain("=");
+
+    const restoredEncryptedWord = EncryptedWord.fromBase64Url(base64UrlString);
+
+    // Check that the restored object is identical to the original
+    expect(restoredEncryptedWord.greenHashes).toEqual(originalData.green);
+    expect(restoredEncryptedWord.yellowHashes).toEqual(originalData.yellow);
+    expect(restoredEncryptedWord.salt).toBe(originalData.salt);
+    expect(restoredEncryptedWord.iterations).toBe(originalData.iterations);
+  });
+});
