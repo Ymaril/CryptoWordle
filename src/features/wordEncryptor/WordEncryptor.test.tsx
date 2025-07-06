@@ -1,6 +1,6 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import WordEncryptor from "./WordEncryptor";
 
 // Helper function to perform the encryption action
@@ -33,6 +33,7 @@ describe("WordEncryptor Component", () => {
       },
       writable: true,
     });
+    
   });
 
   it("should allow a user to enter a word, encrypt it, and see the result link", async () => {
@@ -58,4 +59,20 @@ describe("WordEncryptor Component", () => {
       ).toBeInTheDocument();
     });
   }, 30000);
+
+  it("should not encrypt an empty or invalid word", async () => {
+    render(<WordEncryptor />);
+    const input = screen.getByPlaceholderText("Enter any word");
+    const encryptButton = screen.getByRole("button", { name: /Encrypt/i });
+
+    // Test with empty input
+    fireEvent.change(input, { target: { value: "" } });
+    fireEvent.click(encryptButton);
+    expect(screen.queryByText(/Encrypting progress/i)).not.toBeInTheDocument();
+
+    // Test with invalid characters only
+    fireEvent.change(input, { target: { value: "!@#$" } });
+    fireEvent.click(encryptButton);
+    expect(screen.queryByText(/Encrypting progress/i)).not.toBeInTheDocument();
+  });
 });
