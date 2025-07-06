@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { lastValueFrom } from "rxjs";
-import { EncryptedWord, Word } from "@/entities/word";
+import EncryptedWord from "@/entities/encryptedWord";
+import { Word } from "@/entities/word";
 import { GuessedLetterStatus } from "@/entities/letter";
 
 const { Correct, Misplaced, Wrong } = GuessedLetterStatus;
@@ -186,3 +187,4 @@ describe("EncryptedWord Functionality", () => {
     expect(restoredEncryptedWord.iterations).toBe(originalData.iterations);
   });
 });
+

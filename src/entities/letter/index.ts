@@ -6,4 +6,4 @@ import { GuessedLetterStatus } from "./types/GuessedLetter";
 export { GuessedLetter, GuessedLetterStatus };
 
 export { default as Letter } from "./utils/Letter";
-export type { LetterEncryptProgress } from "./utils/Letter";
+

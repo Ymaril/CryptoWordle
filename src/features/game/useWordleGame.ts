@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { GuessedWord, Word, EncryptedWord } from "@/entities/word";
+import GuessedWord from "@/entities/guessedWord";
+import { Word } from "@/entities/word";
+import EncryptedWord from "@/entities/encryptedWord";
 
 export default function useWordleGame(): UseWordleGame {
   const [targetEncrypted, setTargetEncrypted] = useState<EncryptedWord | null>(

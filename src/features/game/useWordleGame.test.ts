@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor, act } from "@testing-library/react";
 import useWordleGame from "./useWordleGame";
-import { EncryptedWord } from "@/entities/word";
+import EncryptedWord from "@/entities/encryptedWord";
 
 // We will use the hardcoded data from our other test file
 const LEVEL_B64 =

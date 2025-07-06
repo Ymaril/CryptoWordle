@@ -1,4 +1,4 @@
-import { GuessedLetter, GuessedLetterStatus } from "@/entities/letter";
+import { GuessedLetter, GuessedLetterStatus } from "@/entities/letter/@x/guessedWord";
 
 export default class GuessedWord {
   letters: GuessedLetter[];

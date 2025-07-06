@@ -1,8 +1,7 @@
-// src/entities/word/utils/YellowCollection.ts
+// src/entities/word/YellowCollection.ts
 import { Observable, map, combineLatest } from "rxjs";
 import Hash from "@/shared/utils/Hash";
 import { Letter } from "@/entities/letter";
-import { Word } from "..";
 import { shuffleArray } from "@/shared/utils";
 
 export interface ContainsProgress {
@@ -43,7 +42,7 @@ export default class YellowCollection {
   }
 
   static create$(
-    word: Word,
+    letters: Letter[],
     salt: string,
     iterations: number,
   ): Observable<{
@@ -51,7 +50,7 @@ export default class YellowCollection {
     letterProgresses: number[];
     result?: YellowCollection;
   }> {
-    const letterHashStreams$ = word.letters.map((letter) =>
+    const letterHashStreams$ = letters.map((letter) =>
       Hash.create$(letter.char, salt, iterations),
     );
 
@@ -71,7 +70,7 @@ export default class YellowCollection {
         }
 
         const finalHashes = hashProgresses.map((p) => p.result!);
-        const allHashes = this._prepareHashes(finalHashes, word.letters.length);
+        const allHashes = this._prepareHashes(finalHashes, letters.length);
 
         return {
           progress: 1,

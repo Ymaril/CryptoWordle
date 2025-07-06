@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import styles from "./WordEncryptor.module.css";
 import { heavyHash$ } from "@/shared/utils";
 import { Word } from "@/entities/word";
-import { WordEncryptionProgress } from "@/entities/word/utils/Word";
+import EncryptedWord, { WordEncryptionProgress } from "@/entities/encryptedWord";
 
 export default function WordEncryptor() {
   const [word, setWord] = useState<Word | null>(null);
@@ -34,9 +34,8 @@ export default function WordEncryptor() {
 
         const shortSalt = salt.substring(0, 8);
 
-        const sub = word
-          .toEncryptedWord$(shortSalt, iterations)
-          .subscribe((progress) => {
+        const sub = EncryptedWord.fromWord$(word, shortSalt, iterations).subscribe(
+          (progress) => {
             setProgress(progress);
 
             if (progress.result) {
@@ -44,7 +43,8 @@ export default function WordEncryptor() {
               setEncoded(hash);
               window.location.hash = hash;
             }
-          });
+          },
+        );
 
         return () => sub.unsubscribe();
       },
@@ -92,9 +92,9 @@ export default function WordEncryptor() {
             <div className={styles.letterProgress}>
               <div>Progress per letter:</div>
               <div className={styles.letterList}>
-                {progress?.letterProgresses.map((p, i) => (
+                {progress?.letterProgresses.map((p: { green: number; yellow: number }, i: number) => (
                   <div key={i} className={styles.letterBox}>
-                    {Math.round((p.green + p.yellow)/2 * 100)}%
+                    {Math.round(((p.green + p.yellow) / 2) * 100)}%
                   </div>
                 ))}
               </div>
