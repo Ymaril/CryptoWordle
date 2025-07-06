@@ -12,19 +12,59 @@ const { Correct, Misplaced, Wrong } = GuessedLetterStatus;
 // --- Pre-initialized EncryptedWord instances for reuse ---
 const HELLO_ENCRYPTED = new EncryptedWord(
   [
-    new GreenHash(new Hash("220183d83f83d4f46f81889590c73e2fa7f3d43bd183c663d19096238999e53d"), "test-salt", 2),
-    new GreenHash(new Hash("6467afe056efc9a2a99b5e17f2d9c39a545fadd78e64f0eb68a461039bacae0e"), "test-salt", 2),
-    new GreenHash(new Hash("7a094991b06472dd5cab5744f525acd19e7f2f760d3fc028c4e75cf928516446"), "test-salt", 2),
-    new GreenHash(new Hash("ab7953bae459d0898900179f742b864bf1a1a5ea1b3332298b3ca0fe424a98e4"), "test-salt", 2),
-    new GreenHash(new Hash("5f929543811239b900a6173312c5106370d1fdceaf2bbf1da3fbb56b8f96bf9b"), "test-salt", 2),
+    new GreenHash(
+      new Hash(
+        "220183d83f83d4f46f81889590c73e2fa7f3d43bd183c663d19096238999e53d",
+      ),
+      "test-salt",
+      2,
+    ),
+    new GreenHash(
+      new Hash(
+        "6467afe056efc9a2a99b5e17f2d9c39a545fadd78e64f0eb68a461039bacae0e",
+      ),
+      "test-salt",
+      2,
+    ),
+    new GreenHash(
+      new Hash(
+        "7a094991b06472dd5cab5744f525acd19e7f2f760d3fc028c4e75cf928516446",
+      ),
+      "test-salt",
+      2,
+    ),
+    new GreenHash(
+      new Hash(
+        "ab7953bae459d0898900179f742b864bf1a1a5ea1b3332298b3ca0fe424a98e4",
+      ),
+      "test-salt",
+      2,
+    ),
+    new GreenHash(
+      new Hash(
+        "5f929543811239b900a6173312c5106370d1fdceaf2bbf1da3fbb56b8f96bf9b",
+      ),
+      "test-salt",
+      2,
+    ),
   ],
   new YellowCollection(
     [
-      new Hash("05fc87f3b30865616710a49519dcb60aa36ea7823aadb558ca447c785e9471f7"),
-      new Hash("197a886172d0340d383c0676e1a6b37e38961ab8875c5d934f47bd0a3e3d210d"),
-      new Hash("f7175ecadbd3f4449120d8c3c8060590d265d59236ee89e271b073c9601dbae4"),
-      new Hash("6d83a9f11c20cf316eac11c23b1ff34805988eb569864fb12c93580c87288f13"),
-      new Hash("8df55cbf61fed32171f601f2ff73897552c549d99c97a312d736a6c8c5ff6b6e"),
+      new Hash(
+        "05fc87f3b30865616710a49519dcb60aa36ea7823aadb558ca447c785e9471f7",
+      ),
+      new Hash(
+        "197a886172d0340d383c0676e1a6b37e38961ab8875c5d934f47bd0a3e3d210d",
+      ),
+      new Hash(
+        "f7175ecadbd3f4449120d8c3c8060590d265d59236ee89e271b073c9601dbae4",
+      ),
+      new Hash(
+        "6d83a9f11c20cf316eac11c23b1ff34805988eb569864fb12c93580c87288f13",
+      ),
+      new Hash(
+        "8df55cbf61fed32171f601f2ff73897552c549d99c97a312d736a6c8c5ff6b6e",
+      ),
     ],
     "test-salt",
     2,
@@ -32,19 +72,59 @@ const HELLO_ENCRYPTED = new EncryptedWord(
 );
 const APPLE_ENCRYPTED = new EncryptedWord(
   [
-    new GreenHash(new Hash("4f078ae845b2b94fb645ee6c797690f5ff627c75077c56543522227d92771d50"), "test-salt", 2),
-    new GreenHash(new Hash("c3cd1eae0d358d4d242d999a3dc2371acdb6a79c5d680dbce96d0d4a4522aac6"), "test-salt", 2),
-    new GreenHash(new Hash("f9eea79c6658c0fb2571582b2e8028c7aae1ad827555f4727a2f9dfe77944915"), "test-salt", 2),
-    new GreenHash(new Hash("ab7953bae459d0898900179f742b864bf1a1a5ea1b3332298b3ca0fe424a98e4"), "test-salt", 2),
-    new GreenHash(new Hash("556098032924b13f1596f12e54c54306e54375bdba9cae5979c6f76d1864b61e"), "test-salt", 2),
+    new GreenHash(
+      new Hash(
+        "4f078ae845b2b94fb645ee6c797690f5ff627c75077c56543522227d92771d50",
+      ),
+      "test-salt",
+      2,
+    ),
+    new GreenHash(
+      new Hash(
+        "c3cd1eae0d358d4d242d999a3dc2371acdb6a79c5d680dbce96d0d4a4522aac6",
+      ),
+      "test-salt",
+      2,
+    ),
+    new GreenHash(
+      new Hash(
+        "f9eea79c6658c0fb2571582b2e8028c7aae1ad827555f4727a2f9dfe77944915",
+      ),
+      "test-salt",
+      2,
+    ),
+    new GreenHash(
+      new Hash(
+        "ab7953bae459d0898900179f742b864bf1a1a5ea1b3332298b3ca0fe424a98e4",
+      ),
+      "test-salt",
+      2,
+    ),
+    new GreenHash(
+      new Hash(
+        "556098032924b13f1596f12e54c54306e54375bdba9cae5979c6f76d1864b61e",
+      ),
+      "test-salt",
+      2,
+    ),
   ],
   new YellowCollection(
     [
-      new Hash("e02e9a298a8c4f71645ff3b64f4f7931de8c0eba9679f596c815ff828220b67f"),
-      new Hash("9cd0bba922f0504349f696cd15e41af213e9c80ea6f31076f8ced81bdf330ae9"),
-      new Hash("05fc87f3b30865616710a49519dcb60aa36ea7823aadb558ca447c785e9471f7"),
-      new Hash("9823b542342402d0b8635226904c61a08c3fa49180bb068bb5d6c2cae35a60d3"),
-      new Hash("f7175ecadbd3f4449120d8c3c8060590d265d59236ee89e271b073c9601dbae4"),
+      new Hash(
+        "e02e9a298a8c4f71645ff3b64f4f7931de8c0eba9679f596c815ff828220b67f",
+      ),
+      new Hash(
+        "9cd0bba922f0504349f696cd15e41af213e9c80ea6f31076f8ced81bdf330ae9",
+      ),
+      new Hash(
+        "05fc87f3b30865616710a49519dcb60aa36ea7823aadb558ca447c785e9471f7",
+      ),
+      new Hash(
+        "9823b542342402d0b8635226904c61a08c3fa49180bb068bb5d6c2cae35a60d3",
+      ),
+      new Hash(
+        "f7175ecadbd3f4449120d8c3c8060590d265d59236ee89e271b073c9601dbae4",
+      ),
     ],
     "test-salt",
     2,
@@ -52,17 +132,53 @@ const APPLE_ENCRYPTED = new EncryptedWord(
 );
 const LEVEL_ENCRYPTED = new EncryptedWord(
   [
-    new GreenHash(new Hash("cd74d10e25d6382bcec902ec434c51d2de3c8910a24f7c9ef6ec2ff6c6635e50"), "test-salt", 2),
-    new GreenHash(new Hash("6467afe056efc9a2a99b5e17f2d9c39a545fadd78e64f0eb68a461039bacae0e"), "test-salt", 2),
-    new GreenHash(new Hash("192a72e655f922a2653a33bf5a9b027e6a4a6868346a227fdc6a4b99920fec67"), "test-salt", 2),
-    new GreenHash(new Hash("338f141ccb488a33df33e1423c436a44162f6039e7630e70cfd9ac9c4ddd40a4"), "test-salt", 2),
-    new GreenHash(new Hash("2ac9d068f668a4681daf4a50e1b466b09d59c48ca09bd313c12a44bbdd250d30"), "test-salt", 2),
+    new GreenHash(
+      new Hash(
+        "cd74d10e25d6382bcec902ec434c51d2de3c8910a24f7c9ef6ec2ff6c6635e50",
+      ),
+      "test-salt",
+      2,
+    ),
+    new GreenHash(
+      new Hash(
+        "6467afe056efc9a2a99b5e17f2d9c39a545fadd78e64f0eb68a461039bacae0e",
+      ),
+      "test-salt",
+      2,
+    ),
+    new GreenHash(
+      new Hash(
+        "192a72e655f922a2653a33bf5a9b027e6a4a6868346a227fdc6a4b99920fec67",
+      ),
+      "test-salt",
+      2,
+    ),
+    new GreenHash(
+      new Hash(
+        "338f141ccb488a33df33e1423c436a44162f6039e7630e70cfd9ac9c4ddd40a4",
+      ),
+      "test-salt",
+      2,
+    ),
+    new GreenHash(
+      new Hash(
+        "2ac9d068f668a4681daf4a50e1b466b09d59c48ca09bd313c12a44bbdd250d30",
+      ),
+      "test-salt",
+      2,
+    ),
   ],
   new YellowCollection(
     [
-      new Hash("f7175ecadbd3f4449120d8c3c8060590d265d59236ee89e271b073c9601dbae4"),
-      new Hash("05fc87f3b30865616710a49519dcb60aa36ea7823aadb558ca447c785e9471f7"),
-      new Hash("8b9499d7cf9ac2eef97661866261c694564d05ad035d1f41dbdd81b62c865b0c"),
+      new Hash(
+        "f7175ecadbd3f4449120d8c3c8060590d265d59236ee89e271b073c9601dbae4",
+      ),
+      new Hash(
+        "05fc87f3b30865616710a49519dcb60aa36ea7823aadb558ca447c785e9471f7",
+      ),
+      new Hash(
+        "8b9499d7cf9ac2eef97661866261c694564d05ad035d1f41dbdd81b62c865b0c",
+      ),
     ],
     "test-salt",
     2,
@@ -70,18 +186,56 @@ const LEVEL_ENCRYPTED = new EncryptedWord(
 );
 const SPOON_ENCRYPTED = new EncryptedWord(
   [
-    new GreenHash(new Hash("9adff0651c9a4a37bec4def95f3a2d25d2f80b73c2d324c464f69b47177c7466"), "test-salt", 2),
-    new GreenHash(new Hash("c3cd1eae0d358d4d242d999a3dc2371acdb6a79c5d680dbce96d0d4a4522aac6"), "test-salt", 2),
-    new GreenHash(new Hash("b0377c79af6e3c95574dcd1dcab09971b5b919bba19e133f36cd9bb53de03c9e"), "test-salt", 2),
-    new GreenHash(new Hash("1d1532ff2d3e0b77f32bccd8ad526a05333a81eaf5edc7d897688271c297dd77"), "test-salt", 2),
-    new GreenHash(new Hash("18b799f0d5a4a066dc4e513b7a8e5f57857e9c6b78466f81840bbdffde3f0ba6"), "test-salt", 2),
+    new GreenHash(
+      new Hash(
+        "9adff0651c9a4a37bec4def95f3a2d25d2f80b73c2d324c464f69b47177c7466",
+      ),
+      "test-salt",
+      2,
+    ),
+    new GreenHash(
+      new Hash(
+        "c3cd1eae0d358d4d242d999a3dc2371acdb6a79c5d680dbce96d0d4a4522aac6",
+      ),
+      "test-salt",
+      2,
+    ),
+    new GreenHash(
+      new Hash(
+        "b0377c79af6e3c95574dcd1dcab09971b5b919bba19e133f36cd9bb53de03c9e",
+      ),
+      "test-salt",
+      2,
+    ),
+    new GreenHash(
+      new Hash(
+        "1d1532ff2d3e0b77f32bccd8ad526a05333a81eaf5edc7d897688271c297dd77",
+      ),
+      "test-salt",
+      2,
+    ),
+    new GreenHash(
+      new Hash(
+        "18b799f0d5a4a066dc4e513b7a8e5f57857e9c6b78466f81840bbdffde3f0ba6",
+      ),
+      "test-salt",
+      2,
+    ),
   ],
   new YellowCollection(
     [
-      new Hash("030f8a1e1d346616a79de396a0512463b0da45f9b1a408e5286439f50e1dbd10"),
-      new Hash("e02e9a298a8c4f71645ff3b64f4f7931de8c0eba9679f596c815ff828220b67f"),
-      new Hash("6d83a9f11c20cf316eac11c23b1ff34805988eb569864fb12c93580c87288f13"),
-      new Hash("213933cb0cc4e91421ba943f9bc055e6d4838e0d19702fdb930f6345a0920fb6"),
+      new Hash(
+        "030f8a1e1d346616a79de396a0512463b0da45f9b1a408e5286439f50e1dbd10",
+      ),
+      new Hash(
+        "e02e9a298a8c4f71645ff3b64f4f7931de8c0eba9679f596c815ff828220b67f",
+      ),
+      new Hash(
+        "6d83a9f11c20cf316eac11c23b1ff34805988eb569864fb12c93580c87288f13",
+      ),
+      new Hash(
+        "213933cb0cc4e91421ba943f9bc055e6d4838e0d19702fdb930f6345a0920fb6",
+      ),
     ],
     "test-salt",
     2,
@@ -159,13 +313,29 @@ describe("CryptoWordle (Hardcoded, Decoded Tests)", () => {
 describe("EncryptedWord Functionality", () => {
   it("should correctly encode to Base64Url and decode back to the original object", () => {
     const originalGreenHashes = [
-      new GreenHash(new Hash("220183d83f83d4f46f81889590c73e2fa7f3d43bd183c663d19096238999e53d"), "test-salt-functional", 1234),
-      new GreenHash(new Hash("6467afe056efc9a2a99b5e17f2d9c39a545fadd78e64f0eb68a461039bacae0e"), "test-salt-functional", 1234),
+      new GreenHash(
+        new Hash(
+          "220183d83f83d4f46f81889590c73e2fa7f3d43bd183c663d19096238999e53d",
+        ),
+        "test-salt-functional",
+        1234,
+      ),
+      new GreenHash(
+        new Hash(
+          "6467afe056efc9a2a99b5e17f2d9c39a545fadd78e64f0eb68a461039bacae0e",
+        ),
+        "test-salt-functional",
+        1234,
+      ),
     ];
     const originalYellowCollection = new YellowCollection(
       [
-        new Hash("05fc87f3b30865616710a49519dcb60aa36ea7823aadb558ca447c785e9471f7"),
-        new Hash("197a886172d0340d383c0676e1a6b37e38961ab8875c5d934f47bd0a3e3d210d"),
+        new Hash(
+          "05fc87f3b30865616710a49519dcb60aa36ea7823aadb558ca447c785e9471f7",
+        ),
+        new Hash(
+          "197a886172d0340d383c0676e1a6b37e38961ab8875c5d934f47bd0a3e3d210d",
+        ),
       ],
       "test-salt-functional",
       1234,
@@ -192,8 +362,11 @@ describe("EncryptedWord Functionality", () => {
     expect(
       restoredEncryptedWord.yellowCollection.hashes.map((h) => h.toString(32)),
     ).toEqual(originalYellowCollection.hashes.map((h) => h.toString(32)));
-    expect(restoredEncryptedWord.greenHashes[0].salt).toBe(originalGreenHashes[0].salt);
-    expect(restoredEncryptedWord.greenHashes[0].iterations).toBe(originalGreenHashes[0].iterations);
+    expect(restoredEncryptedWord.greenHashes[0].salt).toBe(
+      originalGreenHashes[0].salt,
+    );
+    expect(restoredEncryptedWord.greenHashes[0].iterations).toBe(
+      originalGreenHashes[0].iterations,
+    );
   });
 });
-

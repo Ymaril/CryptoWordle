@@ -23,10 +23,9 @@ export default class GreenHash {
 
     return Hash.create$(data, salt, iterations).pipe(
       map(({ progress, result }) => ({
-          progress,
-          result: result ? new GreenHash(result, salt, iterations) : undefined,
-        })
-      ),
+        progress,
+        result: result ? new GreenHash(result, salt, iterations) : undefined,
+      })),
     );
   }
 

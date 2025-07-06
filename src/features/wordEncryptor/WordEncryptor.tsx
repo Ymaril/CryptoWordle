@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import styles from "./WordEncryptor.module.css";
 import { heavyHash$ } from "@/shared/utils";
 import { Word } from "@/entities/word";
-import EncryptedWord, { WordEncryptionProgress } from "@/entities/encryptedWord";
+import EncryptedWord, {
+  WordEncryptionProgress,
+} from "@/entities/encryptedWord";
 
 export default function WordEncryptor() {
   const [word, setWord] = useState<Word | null>(null);
@@ -28,27 +30,27 @@ export default function WordEncryptor() {
 
     const plainText = word.letters.map((l) => l.char).join("");
 
-    const saltSub = heavyHash$(plainText, 1).subscribe(
-      ({ result: salt }) => {
-        if (!salt) return;
+    const saltSub = heavyHash$(plainText, 1).subscribe(({ result: salt }) => {
+      if (!salt) return;
 
-        const shortSalt = salt.substring(0, 8);
+      const shortSalt = salt.substring(0, 8);
 
-        const sub = EncryptedWord.fromWord$(word, shortSalt, iterations).subscribe(
-          (progress) => {
-            setProgress(progress);
+      const sub = EncryptedWord.fromWord$(
+        word,
+        shortSalt,
+        iterations,
+      ).subscribe((progress) => {
+        setProgress(progress);
 
-            if (progress.result) {
-              const hash = progress.result.toBase64Url(hashLength);
-              setEncoded(hash);
-              window.location.hash = hash;
-            }
-          },
-        );
+        if (progress.result) {
+          const hash = progress.result.toBase64Url(hashLength);
+          setEncoded(hash);
+          window.location.hash = hash;
+        }
+      });
 
-        return () => sub.unsubscribe();
-      },
-    );
+      return () => sub.unsubscribe();
+    });
 
     return () => saltSub.unsubscribe();
   }, [word, iterations, hashLength]);
@@ -92,11 +94,13 @@ export default function WordEncryptor() {
             <div className={styles.letterProgress}>
               <div>Progress per letter:</div>
               <div className={styles.letterList}>
-                {progress?.letterProgresses.map((p: { green: number; yellow: number }, i: number) => (
-                  <div key={i} className={styles.letterBox}>
-                    {Math.round(((p.green + p.yellow) / 2) * 100)}%
-                  </div>
-                ))}
+                {progress?.letterProgresses.map(
+                  (p: { green: number; yellow: number }, i: number) => (
+                    <div key={i} className={styles.letterBox}>
+                      {Math.round(((p.green + p.yellow) / 2) * 100)}%
+                    </div>
+                  ),
+                )}
               </div>
             </div>
           )}

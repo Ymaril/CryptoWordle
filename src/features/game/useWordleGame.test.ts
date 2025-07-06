@@ -7,7 +7,6 @@ import { lastValueFrom } from "rxjs";
 import { heavyHash$ } from "@/shared/utils";
 
 describe("useWordleGame Hook", () => {
-  
   const testIterations = 10; // Low iterations for speed
 
   let encryptedLevelWord: EncryptedWord;
@@ -19,11 +18,13 @@ describe("useWordleGame Hook", () => {
 
     // Generate the encrypted word once for all tests
     const word = new Word("LEVEL");
-    const saltResult = await lastValueFrom(heavyHash$(word.letters.map(l => l.char).join(""), 1));
+    const saltResult = await lastValueFrom(
+      heavyHash$(word.letters.map((l) => l.char).join(""), 1),
+    );
     const shortSalt = saltResult.result.substring(0, 8);
 
     const encryptionProgress = await lastValueFrom(
-      EncryptedWord.fromWord$(word, shortSalt, testIterations)
+      EncryptedWord.fromWord$(word, shortSalt, testIterations),
     );
     encryptedLevelWord = encryptionProgress.result!;
     window.location.hash = encryptedLevelWord.toBase64Url();

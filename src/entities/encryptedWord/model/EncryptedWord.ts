@@ -4,7 +4,10 @@ import { Word } from "@/entities/word/@x/encryptedWord";
 import { GuessedWord } from "@/entities/guessedWord/@x/encryptedWord";
 import GreenHash from "./GreenHash";
 import YellowCollection from "./YellowCollection";
-import { GuessedLetterStatus, Letter } from "@/entities/letter/@x/encryptedWord";
+import {
+  GuessedLetterStatus,
+  Letter,
+} from "@/entities/letter/@x/encryptedWord";
 import { UppercaseLetter } from "@/shared/types";
 import type { WordEncryptionProgress } from "../types";
 
@@ -27,7 +30,9 @@ export default class EncryptedWord {
     iterations: number,
   ): Observable<WordEncryptionProgress> {
     const greenHashes$ = combineLatest(
-      word.letters.map((letter: Letter) => GreenHash.create$(letter, salt, iterations)),
+      word.letters.map((letter: Letter) =>
+        GreenHash.create$(letter, salt, iterations),
+      ),
     );
 
     const yellowCollection$ = YellowCollection.create$(
@@ -38,7 +43,9 @@ export default class EncryptedWord {
 
     return combineLatest([greenHashes$, yellowCollection$]).pipe(
       map(([greenProgresses, yellowProgress]) => {
-        const greenLetterProgresses = greenProgresses.map((p: { progress: number; result?: GreenHash }) => p.progress);
+        const greenLetterProgresses = greenProgresses.map(
+          (p: { progress: number; result?: GreenHash }) => p.progress,
+        );
         const yellowLetterProgresses = yellowProgress?.letterProgresses || [];
 
         const overallGreenProgress =
@@ -55,7 +62,9 @@ export default class EncryptedWord {
         const result =
           progress === 1
             ? new EncryptedWord(
-                greenProgresses.map((p: { progress: number; result?: GreenHash }) => p.result!),
+                greenProgresses.map(
+                  (p: { progress: number; result?: GreenHash }) => p.result!,
+                ),
                 yellowProgress!.result!,
               )
             : undefined;
@@ -100,21 +109,32 @@ export default class EncryptedWord {
     );
 
     return combineLatest(letterStreams).pipe(
-      map((letters: { char: UppercaseLetter; progress: number; status: GuessedLetterStatus | null }[]) => {
-        const progress =
-          letters.reduce((sum: number, l: { progress: number }) => sum + l.progress, 0) / letters.length;
-        if (progress !== 1) return { progress };
+      map(
+        (
+          letters: {
+            char: UppercaseLetter;
+            progress: number;
+            status: GuessedLetterStatus | null;
+          }[],
+        ) => {
+          const progress =
+            letters.reduce(
+              (sum: number, l: { progress: number }) => sum + l.progress,
+              0,
+            ) / letters.length;
+          if (progress !== 1) return { progress };
 
-        const guessedLetters = letters.map(({ char, status }) => ({
-          char,
-          status: status!,
-        }));
+          const guessedLetters = letters.map(({ char, status }) => ({
+            char,
+            status: status!,
+          }));
 
-        return {
-          progress: 1,
-          result: new GuessedWord(guessedLetters),
-        };
-      }),
+          return {
+            progress: 1,
+            result: new GuessedWord(guessedLetters),
+          };
+        },
+      ),
     );
   }
 
@@ -134,7 +154,8 @@ export default class EncryptedWord {
 
     return combineLatest([greenCheck$, yellowCheck$]).pipe(
       map(([greenProgress, yellowProgress]) => {
-        const progress = (greenProgress.progress + (yellowProgress?.progress || 0)) / 2;
+        const progress =
+          (greenProgress.progress + (yellowProgress?.progress || 0)) / 2;
 
         if (progress < 1) {
           return { progress, status: null };

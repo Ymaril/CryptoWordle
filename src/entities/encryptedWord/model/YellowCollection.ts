@@ -82,11 +82,7 @@ export default class YellowCollection {
   }
 
   contains$(letter: Letter): Observable<ContainsProgress> {
-    const checkHash$ = Hash.create$(
-      letter.char,
-      this.salt,
-      this.iterations,
-    );
+    const checkHash$ = Hash.create$(letter.char, this.salt, this.iterations);
 
     return checkHash$.pipe(
       map(({ progress, result }) => {
@@ -120,4 +116,3 @@ export default class YellowCollection {
     return new YellowCollection(hashes, data.salt, data.iterations);
   }
 }
-
