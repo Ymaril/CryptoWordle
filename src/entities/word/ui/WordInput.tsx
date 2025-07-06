@@ -30,7 +30,9 @@ export default function WordInput({
   const handleComplete = (val: string) => {
     const clean = val.toUpperCase().replace(/[^A-Z]/g, "");
     onSubmit(clean);
-    clearOnSubmit && setValue("");
+    if (clearOnSubmit) {
+      setValue("");
+    }
   };
 
   return (

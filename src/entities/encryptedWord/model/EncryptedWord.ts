@@ -56,7 +56,7 @@ export default class EncryptedWord {
           progress === 1
             ? new EncryptedWord(
                 greenProgresses.map((p: { progress: number; result?: GreenHash }) => p.result!),
-                yellowProgress?.result!,
+                yellowProgress!.result!,
               )
             : undefined;
 

@@ -22,7 +22,7 @@ describe("shuffleArray", () => {
   });
 
   it("should handle an empty array", () => {
-    const original: any[] = [];
+    const original: [] = [];
     const shuffled = shuffleArray([...original]);
     expect(shuffled).toEqual([]);
   });

@@ -12,8 +12,7 @@ export default function heavyHash$(
 ): Observable<HeavyHashProgress> {
   return new Observable<HeavyHashProgress>((subscriber) => {
     const encoder = new TextEncoder();
-    let inputBuffer = encoder.encode(data);
-    let resultBuffer = inputBuffer;
+    let resultBuffer = encoder.encode(data);
     const chunkSize = 1000;
     let currentIteration = 0;
     let cancelled = false;

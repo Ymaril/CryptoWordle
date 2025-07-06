@@ -23,8 +23,8 @@ describe("Hash Class", () => {
 
   it("should return true when comparing a hash instance to a matching string prefix", () => {
     const fullHash = new Hash("abcdef123456");
-    const prefixString = "abcdef";
-    expect(fullHash.equals(prefixString)).toBe(true);
+    const prefixHash = new Hash("abcdef");
+    expect(fullHash.equals(prefixHash)).toBe(true);
   });
 
   it("should return false for two different hashes of the same length", () => {
