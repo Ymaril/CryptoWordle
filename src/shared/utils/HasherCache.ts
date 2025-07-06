@@ -7,6 +7,6 @@ export default class HasherCache {
     if (!this.cache.has(key)) {
       this.cache.set(key, factory());
     }
-    return this.cache.get(key)!;
+    return this.cache.get(key)! as Observable<T>;
   }
 }

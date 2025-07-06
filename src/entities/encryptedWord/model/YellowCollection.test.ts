@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { lastValueFrom } from "rxjs";
 import YellowCollection from "./YellowCollection";
 import { Letter } from "@/entities/letter";
-import Hash from "@/shared/utils/Hash";
+
 
 describe("YellowCollection", () => {
   const testSalt = "test-salt";
@@ -43,7 +43,7 @@ describe("YellowCollection", () => {
     expect(result?.hashes).toHaveLength(letters.length);
 
     // Ensure all original unique hashes are present and fake hashes are added to reach the required length
-    const originalUniqueChars = new Set(letters.map(l => l.char));
+    
     const resultHashes = result!.hashes.map(h => h.value);
 
     // This is a probabilistic check, but with 10 iterations and random hashes, it's highly unlikely to fail
