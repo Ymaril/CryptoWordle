@@ -12,6 +12,35 @@ import { UppercaseLetter } from "@/shared/types";
 import type { WordEncryptionProgress } from "../types";
 import protobuf from "protobufjs";
 
+// Load protobuf schema
+const protoSchema = `
+syntax = "proto3";
+
+package cryptowordle;
+
+message GreenHash {
+  bytes hash = 1;
+  string salt = 2;
+  uint32 iterations = 3;
+}
+
+message YellowCollection {
+  repeated bytes hashes = 1;
+  string salt = 2;
+  uint32 iterations = 3;
+}
+
+message EncryptedWord {
+  repeated GreenHash green_hashes = 1;
+  YellowCollection yellow_collection = 2;
+}
+`;
+
+const root = protobuf.parse(protoSchema).root;
+const EncryptedWordMessage = root.lookupType("cryptowordle.EncryptedWord");
+const GreenHashMessage = root.lookupType("cryptowordle.GreenHash");
+const YellowCollectionMessage = root.lookupType("cryptowordle.YellowCollection");
+
 export default class EncryptedWord {
   readonly greenHashes: GreenHash[];
   readonly yellowCollection: YellowCollection;
@@ -175,4 +204,5 @@ export default class EncryptedWord {
     );
   }
 }
+
 
