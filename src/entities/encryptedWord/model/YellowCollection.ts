@@ -27,8 +27,9 @@ export default class YellowCollection {
     const seen = new Set<string>();
     const uniqueHashes: Hash[] = [];
     for (const hash of hashes) {
-      if (!seen.has(hash.value)) {
-        seen.add(hash.value);
+      const hashString = hash.toString();
+      if (!seen.has(hashString)) {
+        seen.add(hashString);
         uniqueHashes.push(hash);
       }
     }
@@ -116,3 +117,4 @@ export default class YellowCollection {
     return new YellowCollection(hashes, data.salt, data.iterations);
   }
 }
+
