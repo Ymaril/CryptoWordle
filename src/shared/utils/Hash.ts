@@ -46,8 +46,17 @@ export default class Hash {
   }
 
   toString(length?: number): string {
-    if (length === undefined) return this.value;
-    return this.value.substring(0, length);
+    const hex = Array.from(this.value)
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    
+    if (length === undefined) return hex;
+    return hex.substring(0, length);
+  }
+
+  truncate(byteLength: number): Hash {
+    const truncatedBytes = this.value.slice(0, byteLength);
+    return new Hash(truncatedBytes);
   }
 
   static create$(
@@ -73,5 +82,6 @@ export default class Hash {
     return new Hash(randomValue);
   }
 }
+
 
 
