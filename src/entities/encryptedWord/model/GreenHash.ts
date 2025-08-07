@@ -47,7 +47,7 @@ export default class GreenHash {
   }
 
   static fromJSON(data: {
-    value: string;
+    value: Uint8Array | string;
     salt: string;
     iterations: number;
   }): GreenHash {
@@ -55,4 +55,5 @@ export default class GreenHash {
     return new GreenHash(hash, data.salt, data.iterations);
   }
 }
+
 
