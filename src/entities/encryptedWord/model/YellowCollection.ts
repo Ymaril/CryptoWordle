@@ -114,13 +114,14 @@ export default class YellowCollection {
   }
 
   static fromJSON(data: {
-    hashes: string[];
+    hashes: Uint8Array[] | string[];
     salt: string;
     iterations: number;
   }): YellowCollection {
-    const hashes = data.hashes.map((h_str) => new Hash(h_str));
+    const hashes = data.hashes.map((h) => new Hash(h));
     return new YellowCollection(hashes, data.salt, data.iterations);
   }
 }
+
 
 
