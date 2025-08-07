@@ -34,12 +34,13 @@ export default class GreenHash {
   }
 
   toJSON(length?: number): {
-    value: string;
+    value: Uint8Array;
     salt: string;
     iterations: number;
   } {
+    const hashData = length !== undefined ? this.hash.truncate(Math.ceil(length / 2)) : this.hash;
     return {
-      value: this.hash.toString(length),
+      value: hashData.value,
       salt: this.salt,
       iterations: this.iterations,
     };
@@ -54,3 +55,4 @@ export default class GreenHash {
     return new GreenHash(hash, data.salt, data.iterations);
   }
 }
+
