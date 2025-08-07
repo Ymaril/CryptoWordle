@@ -29,13 +29,20 @@ export default class Hash {
   }
 
   equals(another: Hash): boolean {
-    const anotherValue = another.value;
-
-    if (this.value.length < anotherValue.length) {
-      return anotherValue.startsWith(this.value);
-    } else {
-      return this.value.startsWith(anotherValue);
+    const thisBytes = this.value;
+    const otherBytes = another.value;
+    
+    // Compare the shorter length against the longer one
+    const minLength = Math.min(thisBytes.length, otherBytes.length);
+    
+    // Compare byte by byte up to the minimum length
+    for (let i = 0; i < minLength; i++) {
+      if (thisBytes[i] !== otherBytes[i]) {
+        return false;
+      }
     }
+    
+    return true; // All compared bytes match
   }
 
   toString(length?: number): string {
@@ -66,4 +73,5 @@ export default class Hash {
     return new Hash(randomValue);
   }
 }
+
 
