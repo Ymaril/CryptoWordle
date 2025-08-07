@@ -108,12 +108,40 @@ export default class EncryptedWord {
     );
   }
 
-  toBase64Url(length?: number): string {
-    const data = {
-      green: this.greenHashes.map((h: GreenHash) => h.toJSON(length)),
-      yellow: this.yellowCollection.toJSON(length),
+  toProtobuf(length?: number): Uint8Array {
+    const greenHashesData = this.greenHashes.map((h: GreenHash) => {
+      const jsonData = h.toJSON(length);
+      return {
+        hash: jsonData.value,
+        salt: jsonData.salt,
+        iterations: jsonData.iterations,
+      };
+    });
+
+    const yellowData = this.yellowCollection.toJSON(length);
+    const yellowCollectionData = {
+      hashes: yellowData.hashes,
+      salt: yellowData.salt,
+      iterations: yellowData.iterations,
     };
-    return encodeBase64Url(JSON.stringify(data));
+
+    const payload = {
+      greenHashes: greenHashesData,
+      yellowCollection: yellowCollectionData,
+    };
+
+    const message = EncryptedWordMessage.create(payload);
+    return EncryptedWordMessage.encode(message).finish();
+  }
+
+  toBase64Url(length?: number): string {
+    const protobufData = this.toProtobuf(length);
+    // Convert Uint8Array to base64url string
+    const base64 = btoa(String.fromCharCode(...protobufData))
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+    return base64;
   }
 
   static fromBase64Url(encoded: string): EncryptedWord {
@@ -204,5 +232,6 @@ export default class EncryptedWord {
     );
   }
 }
+
 
 
