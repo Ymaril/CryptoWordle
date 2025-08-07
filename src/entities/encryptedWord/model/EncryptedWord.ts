@@ -10,6 +10,7 @@ import {
 } from "@/entities/letter/@x/encryptedWord";
 import { UppercaseLetter } from "@/shared/types";
 import type { WordEncryptionProgress } from "../types";
+import protobuf from "protobufjs";
 
 export default class EncryptedWord {
   readonly greenHashes: GreenHash[];
@@ -174,3 +175,4 @@ export default class EncryptedWord {
     );
   }
 }
+
