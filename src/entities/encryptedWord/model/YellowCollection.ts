@@ -97,12 +97,17 @@ export default class YellowCollection {
   }
 
   toJSON(length?: number): {
-    hashes: string[];
+    hashes: Uint8Array[];
     salt: string;
     iterations: number;
   } {
     return {
-      hashes: this.hashes.map((h) => h.toString(length)),
+      hashes: this.hashes.map((h) => {
+        if (length !== undefined) {
+          return h.truncate(Math.ceil(length / 2)).value;
+        }
+        return h.value;
+      }),
       salt: this.salt,
       iterations: this.iterations,
     };
@@ -117,4 +122,5 @@ export default class YellowCollection {
     return new YellowCollection(hashes, data.salt, data.iterations);
   }
 }
+
 
