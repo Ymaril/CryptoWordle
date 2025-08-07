@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package cryptowordle;
+
+// Represents a hash for a specific letter position (green hash)
+message GreenHash {
+  // Binary hash data (instead of hex string)
+  bytes hash = 1;
+  // Salt used for hashing
+  string salt = 2;
+  // Number of iterations used for hashing
+  uint32 iterations = 3;
+}
+
+// Represents a collection of hashes for yellow letters
+message YellowCollection {
+  // Array of binary hash data (instead of hex strings)
+  repeated bytes hashes = 1;
+  // Salt used for hashing
+  string salt = 2;
+  // Number of iterations used for hashing
+  uint32 iterations = 3;
+}
+
+// Main message representing an encrypted word
+message EncryptedWord {
+  // Array of green hashes, one for each letter position
+  repeated GreenHash green_hashes = 1;
+  // Collection of yellow letter hashes
+  YellowCollection yellow_collection = 2;
+}

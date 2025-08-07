@@ -10,6 +10,36 @@ import {
 } from "@/entities/letter/@x/encryptedWord";
 import { UppercaseLetter } from "@/shared/types";
 import type { WordEncryptionProgress } from "../types";
+import protobuf from "protobufjs";
+
+// Load protobuf schema
+const protoSchema = `
+syntax = "proto3";
+
+package cryptowordle;
+
+message GreenHash {
+  bytes hash = 1;
+  string salt = 2;
+  uint32 iterations = 3;
+}
+
+message YellowCollection {
+  repeated bytes hashes = 1;
+  string salt = 2;
+  uint32 iterations = 3;
+}
+
+message EncryptedWord {
+  repeated GreenHash green_hashes = 1;
+  YellowCollection yellow_collection = 2;
+}
+`;
+
+const root = protobuf.parse(protoSchema).root;
+const EncryptedWordMessage = root.lookupType("cryptowordle.EncryptedWord");
+const GreenHashMessage = root.lookupType("cryptowordle.GreenHash");
+const YellowCollectionMessage = root.lookupType("cryptowordle.YellowCollection");
 
 export default class EncryptedWord {
   readonly greenHashes: GreenHash[];
@@ -78,20 +108,76 @@ export default class EncryptedWord {
     );
   }
 
-  toBase64Url(length?: number): string {
-    const data = {
-      green: this.greenHashes.map((h: GreenHash) => h.toJSON(length)),
-      yellow: this.yellowCollection.toJSON(length),
+  toProtobuf(length?: number): Uint8Array {
+    const greenHashesData = this.greenHashes.map((h: GreenHash) => {
+      const jsonData = h.toJSON(length);
+      return {
+        hash: jsonData.value,
+        salt: jsonData.salt,
+        iterations: jsonData.iterations,
+      };
+    });
+
+    const yellowData = this.yellowCollection.toJSON(length);
+    const yellowCollectionData = {
+      hashes: yellowData.hashes,
+      salt: yellowData.salt,
+      iterations: yellowData.iterations,
     };
-    return encodeBase64Url(JSON.stringify(data));
+
+    const payload = {
+      greenHashes: greenHashesData,
+      yellowCollection: yellowCollectionData,
+    };
+
+    const message = EncryptedWordMessage.create(payload);
+    return EncryptedWordMessage.encode(message).finish();
+  }
+
+  toBase64Url(length?: number): string {
+    const protobufData = this.toProtobuf(length);
+    // Convert Uint8Array to base64url string
+    const base64 = btoa(String.fromCharCode(...protobufData))
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+    return base64;
+  }
+
+  static fromProtobuf(data: Uint8Array): EncryptedWord {
+    const message = EncryptedWordMessage.decode(data);
+    const messageObj = EncryptedWordMessage.toObject(message);
+
+    const greenHashes = messageObj.greenHashes.map((gh: any) =>
+      GreenHash.fromJSON({
+        value: new Uint8Array(gh.hash),
+        salt: gh.salt,
+        iterations: gh.iterations,
+      })
+    );
+
+    const yellowCollection = YellowCollection.fromJSON({
+      hashes: messageObj.yellowCollection.hashes.map((h: any) => new Uint8Array(h)),
+      salt: messageObj.yellowCollection.salt,
+      iterations: messageObj.yellowCollection.iterations,
+    });
+
+    return new EncryptedWord(greenHashes, yellowCollection);
   }
 
   static fromBase64Url(encoded: string): EncryptedWord {
-    const { green, yellow } = JSON.parse(decodeBase64Url(encoded));
-    return new EncryptedWord(
-      green.map(GreenHash.fromJSON),
-      YellowCollection.fromJSON(yellow),
-    );
+    // Convert base64url string back to Uint8Array
+    const base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
+    const pad = 4 - (base64.length % 4);
+    const paddedBase64 = pad !== 4 ? base64 + "=".repeat(pad) : base64;
+    
+    const binaryString = atob(paddedBase64);
+    const protobufData = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      protobufData[i] = binaryString.charCodeAt(i);
+    }
+    
+    return this.fromProtobuf(protobufData);
   }
 
   checkWord$(word: Word): Observable<{
@@ -174,3 +260,7 @@ export default class EncryptedWord {
     );
   }
 }
+
+
+
+

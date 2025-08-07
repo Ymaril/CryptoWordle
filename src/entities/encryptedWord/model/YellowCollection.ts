@@ -27,8 +27,9 @@ export default class YellowCollection {
     const seen = new Set<string>();
     const uniqueHashes: Hash[] = [];
     for (const hash of hashes) {
-      if (!seen.has(hash.value)) {
-        seen.add(hash.value);
+      const hashString = hash.toString();
+      if (!seen.has(hashString)) {
+        seen.add(hashString);
         uniqueHashes.push(hash);
       }
     }
@@ -96,23 +97,29 @@ export default class YellowCollection {
   }
 
   toJSON(length?: number): {
-    hashes: string[];
+    hashes: Uint8Array[];
     salt: string;
     iterations: number;
   } {
     return {
-      hashes: this.hashes.map((h) => h.toString(length)),
+      hashes: this.hashes.map((h) => {
+        if (length !== undefined) {
+          return h.truncate(Math.ceil(length / 2)).value;
+        }
+        return h.value;
+      }),
       salt: this.salt,
       iterations: this.iterations,
     };
   }
 
   static fromJSON(data: {
-    hashes: string[];
+    hashes: Uint8Array[] | string[];
     salt: string;
     iterations: number;
   }): YellowCollection {
-    const hashes = data.hashes.map((h_str) => new Hash(h_str));
+    const hashes = data.hashes.map((h) => new Hash(h));
     return new YellowCollection(hashes, data.salt, data.iterations);
   }
 }
+

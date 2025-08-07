@@ -42,7 +42,12 @@ describe("WordEncryptor Component", () => {
     expect(resultLinkInput).toBeInTheDocument();
     const linkValue = (resultLinkInput as HTMLInputElement).value;
     expect(linkValue).toContain("#");
-    expect(linkValue).toContain("ey");
+    // Check that the hash contains a valid base64url-encoded protobuf string
+    const hashPart = linkValue.split("#")[1];
+    expect(hashPart).toBeTruthy();
+    expect(hashPart.length).toBeGreaterThan(10); // Should be a substantial encoded string
+    // Verify it's valid base64url format (no +, /, or = characters)
+    expect(hashPart).toMatch(/^[A-Za-z0-9_-]+$/);
   }, 30000);
 
   it("should allow the user to copy the link", async () => {

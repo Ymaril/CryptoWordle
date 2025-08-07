@@ -3,7 +3,7 @@ import { Observable } from "rxjs";
 export interface HeavyHashProgress {
   progress: number;
   iteration: number;
-  result: string;
+  result: string | Uint8Array;
 }
 
 export default function heavyHash$(
@@ -67,3 +67,4 @@ export default function heavyHash$(
     };
   });
 }
+
