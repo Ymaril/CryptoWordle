@@ -8,10 +8,24 @@ export interface HashProgress {
 }
 
 export default class Hash {
-  readonly value: string;
+  readonly value: Uint8Array;
 
-  constructor(value: string) {
-    this.value = value.toLowerCase();
+  constructor(value: Uint8Array | string) {
+    if (typeof value === 'string') {
+      // Convert hex string to Uint8Array for backward compatibility
+      this.value = this.hexToUint8Array(value);
+    } else {
+      this.value = value;
+    }
+  }
+
+  private hexToUint8Array(hex: string): Uint8Array {
+    const cleanHex = hex.toLowerCase().replace(/[^0-9a-f]/g, '');
+    const bytes = new Uint8Array(cleanHex.length / 2);
+    for (let i = 0; i < cleanHex.length; i += 2) {
+      bytes[i / 2] = parseInt(cleanHex.substr(i, 2), 16);
+    }
+    return bytes;
   }
 
   equals(another: Hash): boolean {
@@ -52,3 +66,4 @@ export default class Hash {
     return new Hash(randomValue);
   }
 }
+
