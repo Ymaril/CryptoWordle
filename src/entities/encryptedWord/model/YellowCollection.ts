@@ -123,5 +123,3 @@ export default class YellowCollection {
   }
 }
 
-
-
