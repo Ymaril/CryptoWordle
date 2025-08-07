@@ -73,15 +73,11 @@ export default class Hash {
   }
 
   static createRandom(): Hash {
-    const randomValue = Array.from(
-      globalThis.crypto.getRandomValues(new Uint8Array(32)),
-    )
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-
-    return new Hash(randomValue);
+    const randomBytes = globalThis.crypto.getRandomValues(new Uint8Array(32));
+    return new Hash(randomBytes);
   }
 }
+
 
 
 
